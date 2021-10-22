@@ -19,29 +19,25 @@ import java.util.List;
 import java.util.Stack;
 import java.util.Vector;
 
-public class EventChecker  extends AppCompatActivity {
+public class EventManagement extends AppCompatActivity {
 
     private static final Stack<LocalDateTime> touchEvents = new Stack<>();  // 터치 이벤트 저장
 
     // 터치 이벤트 추가
     public void addTouchEvent(){
-        Log.v("EventChecker", "cur time: " + LocalDateTime.now().toString());
         touchEvents.add(LocalDateTime.now());
-        Log.v("EventChecker", "add current time");
     }
 
-    public void checkTouchEvent(){
+    public boolean checkTouchEvent(){
         LocalDateTime cur = LocalDateTime.now();
         LocalDateTime latest = touchEvents.peek();
 
-        ChronoUnit.SECONDS(latest, cur);
-        Log.v("EventChecker", "========================sec: " + diff);
+        int diff = (int)ChronoUnit.SECONDS.between(latest, cur);
+
+        // 이벤트 탐색 범위 5분으로 설정
+        return diff < 300;
 
     }
 
-//    public boolean checkTouch(){
-//
-//
-//    }
 
 }

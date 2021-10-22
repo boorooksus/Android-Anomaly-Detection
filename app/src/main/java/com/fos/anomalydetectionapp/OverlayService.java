@@ -1,5 +1,6 @@
 package com.fos.anomalydetectionapp;
 
+import android.annotation.SuppressLint;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -12,21 +13,19 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.ImageButton;
-import android.widget.TextView;
 
 import static android.view.WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
-import static android.view.WindowManager.LayoutParams.TYPE_APPLICATION_PANEL;
 
 public class OverlayService extends Service {
 
     WindowManager wm;
     View mView;
-    EventChecker eventChecker = new EventChecker();
+    EventManagement eventManagement = new EventManagement();
 
     @Override
     public IBinder onBind(Intent intent) { return null; }
 
+    @SuppressLint({"RtlHardcoded", "InflateParams"})
     @Override
     public void onCreate() {
         super.onCreate();
@@ -45,12 +44,12 @@ public class OverlayService extends Service {
                         |WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
                 PixelFormat.TRANSLUCENT);
 
-//        params.gravity = Gravity.LEFT | Gravity.TOP;
-//        final TextView textView = (TextView) mView.findViewById(R.id.textView);
+        params.gravity = Gravity.LEFT | Gravity.TOP;
 
         mView = inflate.inflate(R.layout.overlay_view, null);
 
         mView.setOnTouchListener(new View.OnTouchListener() {
+            @SuppressLint("ClickableViewAccessibility")
             @Override
             public boolean onTouch(View v, MotionEvent event) {
 
@@ -59,8 +58,7 @@ public class OverlayService extends Service {
 
                 Log.v("OverlayService", "================== x: " + posX + " y: " + posY);
 
-                eventChecker.addTouchEvent();
-                eventChecker.checkTouchEvent();
+                eventManagement.addTouchEvent();
 
                 return true;
             }
