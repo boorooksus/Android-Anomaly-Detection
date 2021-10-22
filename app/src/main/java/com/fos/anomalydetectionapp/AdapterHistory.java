@@ -15,7 +15,7 @@ import java.time.format.DateTimeFormatter;
 // 네트워크 히스토리 리스트뷰 어댑터
 public class AdapterHistory extends BaseAdapter {
 
-    Histories histories = new Histories();  // 트래픽 히스토리 목록 인스턴스
+    TrafficHistory trafficHistory = new TrafficHistory();  // 트래픽 히스토리 목록 인스턴스
     LayoutInflater layoutInflater;
     Context context;  // 메인 액티비티 컨텍스트
 
@@ -27,12 +27,12 @@ public class AdapterHistory extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return histories.getLength();
+        return trafficHistory.getLength();
     }
 
     @Override
-    public History getItem(int position) {
-        return histories.getHistory(position);
+    public TrafficDetail getItem(int position) {
+        return trafficHistory.getTraffic(position);
     }
 
     @Override
@@ -46,13 +46,13 @@ public class AdapterHistory extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         // res/layout/istview_custom.xml 가져옴
         @SuppressLint("ViewHolder") View view = layoutInflater.inflate(R.layout.listview_custom, null);
-        History history = histories.getHistory(position);
+        TrafficDetail trafficDetail = trafficHistory.getTraffic(position);
 
-        LocalDateTime time = history.getTime();  // 업데이트 시각
-        String name = history.getAppLabel() + " (" + history.getAppProcessName() + ")";  // 앱 이름
-        int uid = history.getUid();  // 앱 uid
-        long usage = history.getUsage();  // 앱 사용량
-        long diff = history.getDiff();  // 앱 트래픽 증가양
+        LocalDateTime time = trafficDetail.getTime();  // 업데이트 시각
+        String name = trafficDetail.getAppLabel() + " (" + trafficDetail.getAppProcessName() + ")";  // 앱 이름
+        int uid = trafficDetail.getUid();  // 앱 uid
+        long usage = trafficDetail.getUsage();  // 앱 사용량
+        long diff = trafficDetail.getDiff();  // 앱 트래픽 증가양
 
         TextView viewTime = view.findViewById(R.id.textViewTime);  // 시간
         TextView viewName = view.findViewById(R.id.textViewName);  // 앱 이름

@@ -1,11 +1,14 @@
 package com.fos.anomalydetectionapp;
 
 import android.app.Activity;
+import android.util.Log;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 
 // 내부 스토리지 로그 파일 관리 클래스
@@ -20,7 +23,7 @@ public class LogInternalFileProcessor implements LogFileProcessor{
 
     // 로그 파일 입력 함수
     @Override
-    public void writeLog(Activity activity, String log){
+    public void writeLog(Activity activity, TrafficDetail trafficDetail){
         // 로그 파일
         File file = new File(activity.getFilesDir(), "LogInternalFile.csv");
 
@@ -51,7 +54,18 @@ public class LogInternalFileProcessor implements LogFileProcessor{
             FileWriter fw = new FileWriter( file.getAbsoluteFile() ,true);
             BufferedWriter bw = new BufferedWriter( fw );
 
-            bw.write(log);
+            LocalDateTime time = trafficDetail.getTime();  // 업데이트 시각
+            String name = trafficDetail.getAppLabel();
+            String processName = trafficDetail.getAppProcessName();  // 앱 이름
+            int uid = trafficDetail.getUid();  // 앱 uid
+            long usage = trafficDetail.getUsage();  // 앱 사용량
+            long diff = trafficDetail.getDiff();  // 앱 트래픽 증가양
+
+            String data = time.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            data += "," + uid + "," + usage + "," + diff + "," + name + "," + processName;
+            Log.v("", data);
+
+            bw.write(data);
             bw.newLine();
             bw.close();
 

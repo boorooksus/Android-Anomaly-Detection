@@ -8,5 +8,5 @@ public interface LogFileProcessor {
     boolean checkStoragePermission(Activity activity);
 
     // 로그 파일에 로그 추가
-    void  writeLog(Activity activity, String log);
+    void  writeLog(Activity activity, TrafficDetail trafficDetail);
 }

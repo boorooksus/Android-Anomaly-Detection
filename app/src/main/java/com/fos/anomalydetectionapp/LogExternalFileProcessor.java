@@ -11,6 +11,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 // External Storage 파일 관리 class
 public class LogExternalFileProcessor implements LogFileProcessor {
@@ -45,8 +47,9 @@ public class LogExternalFileProcessor implements LogFileProcessor {
     }
 
     // 로그 파일 입력 함수
+    // API 30 부터는 사용할 수 없음
     @Override
-    public void writeLog(Activity activity, String log){
+    public void writeLog(Activity activity, TrafficDetail trafficDetail){
 
         // 파일을 저장할 디렉토리
         File dir = new File(activity.getFilesDir(), "../../../../sdcard/TrafficMonitor");
@@ -88,7 +91,18 @@ public class LogExternalFileProcessor implements LogFileProcessor {
             FileWriter fw = new FileWriter( file.getAbsoluteFile() ,true);
             BufferedWriter bw = new BufferedWriter( fw );
 
-            bw.write(log);
+            LocalDateTime time = trafficDetail.getTime();  // 업데이트 시각
+            String name = trafficDetail.getAppLabel();
+            String processName = trafficDetail.getAppProcessName();  // 앱 이름
+            int uid = trafficDetail.getUid();  // 앱 uid
+            long usage = trafficDetail.getUsage();  // 앱 사용량
+            long diff = trafficDetail.getDiff();  // 앱 트래픽 증가양
+
+            String data = time.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            data += "," + uid + "," + usage + "," + diff + "," + name + "," + processName;
+            Log.v("", data);
+
+            bw.write(data);
             bw.newLine();
             bw.close();
 

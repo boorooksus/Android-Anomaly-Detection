@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
                     // 스위치 켰을 때
 
                     //  권한 확인
-                    if (trafficMonitor.checkPermissions()) {
+                    if (trafficMonitor.checkPermission()) {
                         // 앱 사용 기록 엑세스 권한 있는 경우
 
                         // 작동 여부 공유 변수 true로 변경
