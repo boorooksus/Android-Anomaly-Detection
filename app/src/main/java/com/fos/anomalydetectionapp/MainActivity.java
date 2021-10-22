@@ -1,11 +1,20 @@
 package com.fos.anomalydetectionapp;
 
+import static android.view.WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.Service;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ListView;
@@ -24,6 +33,9 @@ public class MainActivity extends AppCompatActivity {
     Activity activity;  // 메인 액티비티
     String colorRunning = "#41A541";  // 러닝 중일 때 버튼 색상(녹색)
     String colorStopped = "#808080";  // 중단 됐을 때 버튼 색상(회색)
+
+    // ================== 오버레이 클래스 분리 시 이것도 가져갈 것
+    private static final int ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE = 1;
 
 
     @Override
@@ -50,10 +62,16 @@ public class MainActivity extends AppCompatActivity {
         // 트래픽 모니터링 클래스
         final TrafficMonitor trafficMonitor = new TrafficMonitor(activity, adapterHistory);
 
+        // ==================
+        checkPermission();
+//        startService(new Intent(MainActivity.this, OverlayService.class));
+//        Log.v("Main", "start Service");
+
         if(isRunning){
             // 스위치가 켜져있다면 모니터링 실행
             trafficMonitor.startTracking();
         }
+
 
         // 모니터링 온오프 스위치 이벤트 리스터
         switchTracking.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -91,5 +109,30 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    public void checkPermission() {
+        if (!Settings.canDrawOverlays(this)) {
+            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    Uri.parse("package:" + getPackageName()));
+            activity.startActivityForResult(intent, TYPE_APPLICATION_OVERLAY);
+        } else {
+            Log.v("Main", "before Service");
+            startService(new Intent(MainActivity.this, OverlayService.class));
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE) {
+            if (!Settings.canDrawOverlays(this)) {
+                // TODO 동의를 얻지 못했을 경우의 처리
+
+            } else {
+                startService(new Intent(MainActivity.this, OverlayService.class));
+            }
+        }
     }
 }
