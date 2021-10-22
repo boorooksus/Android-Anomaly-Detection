@@ -21,23 +21,17 @@ import java.util.Vector;
 
 public class EventManagement extends AppCompatActivity {
 
-    private static final Stack<LocalDateTime> touchEvents = new Stack<>();  // 터치 이벤트 저장
+    private static LocalDateTime lastTouchTime = LocalDateTime.now();  // 터치 이벤트 저장
 
     // 터치 이벤트 추가
     public void addTouchEvent(){
-        touchEvents.add(LocalDateTime.now());
+        lastTouchTime = LocalDateTime.now();
     }
 
     public boolean checkTouchEvent(){
-        LocalDateTime cur = LocalDateTime.now();
-        LocalDateTime latest = touchEvents.peek();
+        // 30초 이내에 터치 기록이 있었는지 확인
 
-        int diff = (int)ChronoUnit.SECONDS.between(latest, cur);
-
-        // 이벤트 탐색 범위 5분으로 설정
-        return diff < 300;
-
+        int diff = (int)ChronoUnit.SECONDS.between(lastTouchTime, LocalDateTime.now());
+        return diff < 30;
     }
-
-
 }

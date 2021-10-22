@@ -1,5 +1,7 @@
 package com.fos.anomalydetectionapp;
 
+import static android.view.WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -12,6 +14,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.net.NetworkCapabilities;
+import android.net.Uri;
 import android.os.RemoteException;
 import android.provider.Settings;
 import android.util.Log;
@@ -118,7 +121,11 @@ public class TrafficMonitor extends AppCompatActivity {
                                 public void onClick(DialogInterface dialog, int which)
                                 {
                                     // 유저를 설정 페이지로 보냄
+//                                    Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS,
+//                                            Uri.parse("package:" + activity.getPackageName()));
+//                                    activity.startActivityForResult(intent, TYPE_APPLICATION_OVERLAY);
                                     activity.startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
+                                    //ACTION_MANAGE_OVERLAY_PERMISSION
                                     //finish();
                                 }
                             });

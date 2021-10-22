@@ -56,7 +56,7 @@ public class OverlayService extends Service {
                 int posX = (int)event.getX();
                 int posY = (int)event.getY();
 
-                Log.v("OverlayService", "================== x: " + posX + " y: " + posY);
+                Log.v("OverlayService", "TOUCH EVENT OCCURRED! (" + posX + ", " + posY + ")");
 
                 eventManagement.addTouchEvent();
 
@@ -68,15 +68,15 @@ public class OverlayService extends Service {
 
     }
 
-//    @Override
-//    public void onDestroy() {
-//        super.onDestroy();
-//        if(wm != null) {
-//            if(mView != null) {
-//                wm.removeView(mView);
-//                mView = null;
-//            }
-//            wm = null;
-//        }
-//    }
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(wm != null) {
+            if(mView != null) {
+                wm.removeView(mView);
+                mView = null;
+            }
+            wm = null;
+        }
+    }
 }
