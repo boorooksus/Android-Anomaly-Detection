@@ -61,11 +61,11 @@ public class LogInternalFileProcessor implements LogFileProcessor{
             long usage = trafficDetail.getUsage();  // 앱 사용량
             long diff = trafficDetail.getDiff();  // 앱 트래픽 증가양
 
-            String data = time.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-            data += "," + uid + "," + usage + "," + diff + "," + name + "," + processName;
-            Log.v("", data);
+            String log = time.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            log += "," + uid + "," + usage + "," + diff + "," + name + "," + processName;
+            Log.v("LogInternalFileProcessor", log);
 
-            bw.write(data);
+            bw.write(log);
             bw.newLine();
             bw.close();
 
