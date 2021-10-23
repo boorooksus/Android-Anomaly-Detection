@@ -41,7 +41,7 @@ public class TrafficMonitor extends AppCompatActivity {
     private final PackageManager pm;  // 앱 정보들을 얻기 위한 패키지 매니저
     private static LogInternalFileProcessor logFileProcessor;  // 로그 파일 쓰기 위한 객체
     AdapterHistory adapterHistory;  // 히스토리 리스트뷰 어댑터
-    EventManagement eventManagement = new EventManagement();
+    EventManagement eventManagement;
 
     // Constructor
     public TrafficMonitor(Activity activity, AdapterHistory adapterHistory) {
@@ -54,6 +54,7 @@ public class TrafficMonitor extends AppCompatActivity {
         this.activity = activity;
         this.adapterHistory = adapterHistory;
         logFileProcessor = new LogInternalFileProcessor();
+        eventManagement = new EventManagement();
 
         pm = activity.getPackageManager();
         networkStatsManager =
@@ -139,13 +140,16 @@ public class TrafficMonitor extends AppCompatActivity {
                             log += "," + uid + "," + txBytes + "," + diff + "," + appLabel + "," + processName;
                             Log.v("TrafficMonitor", log);
 
-                            if(eventManagement.checkTouchEvent()){
-                                Log.v("TrafficMonitor", "Safe Traffic");
+                            if(eventManagement.checkTouchEvent())
+                                Log.v("TrafficMonitor", "Touch Event Detected");
+                            else
+                                Log.v("TrafficMonitor", "No Touch Event!!!!");
 
-                            } else{
-                                Log.v("TrafficMonitor", "No User Event!!!!");
+                            if(eventManagement.checkAudioEvent(activity))
+                                Log.v("TrafficMonitor", "Audio Playing Detected");
+                            else
+                                Log.v("TrafficMonitor", "No Audio Playing");
 
-                            }
                         }
                     });
                 }

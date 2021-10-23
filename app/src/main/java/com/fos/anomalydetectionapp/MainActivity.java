@@ -64,17 +64,17 @@ public class MainActivity extends AppCompatActivity {
         buttonStatus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                EventManagement eventManagement = new EventManagement();
-
-                AudioManager manager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
-
-                if (eventManagement.checkAudioEvent(MainActivity.this)){
-
-                    Log.v("Main - Audio", "=-=======Audio is Playing");
-                } else{
-                    Log.v("Main - Audio", "=-=======Audio is NOT Playing");
-
-                }
+//                EventManagement eventManagement = new EventManagement();
+//
+//                AudioManager manager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+//
+//                if (eventManagement.checkAudioEvent(MainActivity.this)){
+//
+//                    Log.v("Main - Audio", "=-=======Audio is Playing");
+//                } else{
+//                    Log.v("Main - Audio", "=-=======Audio is NOT Playing");
+//
+//                }
             }
         });
 
