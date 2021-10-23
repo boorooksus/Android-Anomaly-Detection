@@ -69,7 +69,11 @@ public class MainActivity extends AppCompatActivity {
 
         if(isRunning){
             // 스위치가 켜져있다면 모니터링 실행
-            trafficMonitor.startTracking();
+//            trafficMonitor.startTracking();
+
+            // 모니터링 시작
+//            startService(new Intent(MainActivity.this, TrafficMonitorService.class));
+//                        trafficMonitor.startTracking();
         }
 
 
@@ -89,12 +93,35 @@ public class MainActivity extends AppCompatActivity {
                         editor.putBoolean("isRunning", true); // 스위치 상태 변수 세팅
                         editor.apply(); // 스위치 상태 변수 저장
 
-//                        // 오버레이 생성
+
+//                        new Thread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                startService(new Intent(MainActivity.this, OverlayService.class));
+//
+//
+//                            }
+//                        }).start();
+//
+//                        new Thread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                startService(new Intent(MainActivity.this, TrafficMonitorService.class));
+//
+//                            }
+//                        }).start();
+                        // 모니터링 시작
+                        Log.v("Main", "before...");
+                        TrafficMonitorService trafficMonitorService = new TrafficMonitorService();
+                        trafficMonitorService.setArgs(MainActivity.this, adapterHistory);
+                        Log.v("Main", "right before...");
+                        startService(new Intent(MainActivity.this, TrafficMonitorService.class));
+                        Log.v("Main", "right after...");
+
+                        //                        // 오버레이 생성
 //                        overlayController.startOverlay();
                         startService(new Intent(MainActivity.this, OverlayService.class));
 
-                        // 모니터링 시작
-                        startService(new Intent(MainActivity.this, TrafficMonitorService.class));
 //                        trafficMonitor.startTracking();
 
                         buttonStatus.setBackgroundColor(Color.parseColor(colorRunning));
@@ -116,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
                     // 오버레이 제거
 //                    overlayController.stopOverlay();
                     stopService(new Intent(MainActivity.this, OverlayService.class));
+                    stopService(new Intent(MainActivity.this, TrafficMonitorService.class));
                 }
             }
         });

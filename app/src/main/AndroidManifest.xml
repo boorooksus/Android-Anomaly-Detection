@@ -27,6 +27,11 @@
             android:enabled="true"
             android:exported="true"
             android:permission="android.permission.SYSTEM_ALERT_WINDOW"/>
+        <service
+            android:name=".TrafficMonitorService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.SYSTEM_ALERT_WINDOW"/>
 
         <activity
             android:name=".MainActivity"

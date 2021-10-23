@@ -6,6 +6,8 @@
     <TextView
         android:layout_width="100dp"
         android:layout_height="100dp"
+        android:text="Hello World!"
+        android:textColor="#ffffff"
         android:id="@+id/textView" />
 
 </LinearLayout>

@@ -29,6 +29,7 @@ public class OverlayService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+
         LayoutInflater inflate = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         wm = (WindowManager) getSystemService(WINDOW_SERVICE);
 
@@ -56,7 +57,7 @@ public class OverlayService extends Service {
                 int posX = (int)event.getX();
                 int posY = (int)event.getY();
 
-                Log.v("OverlayService", "TOUCH EVENT OCCURRED! (" + posX + ", " + posY + ")");
+//                Log.v("OverlayService", "TOUCH EVENT OCCURRED! (" + posX + ", " + posY + ")");
 
                 eventManagement.addTouchEvent();
 

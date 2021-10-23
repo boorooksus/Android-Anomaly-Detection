@@ -78,7 +78,7 @@ public class TrafficMonitor extends AppCompatActivity {
                 }
 
                 // 현재까지 앱별로 데이터 사용량 저장
-                updateUsage();
+//                updateUsage();
 
             }
         }).start();
@@ -138,60 +138,64 @@ public class TrafficMonitor extends AppCompatActivity {
         }
     }
 
-    // 일정 시간마다 앱 트래픽 모니터링하는 함수
-    public void startTracking() {
-
-        // 디바이스에 설치된 어플들 이름 저장 및 현재까지 사용한 트래픽 초기화
-        if(!isInitialized) {
-            initializeTraffic();
-        }
-
-        // 일정 시간 간격으로 앱별 네트워크 사용량 체크하는 타이머
-        final Timer timer = new Timer();
-        TimerTask timerTask = new TimerTask() {
-            @Override
-            public void run() {
-                // 쓰레드 생성
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        updateUsage();
-                    }
-                }).start();
-
-            }
-        };
-
-        // 네트워크 사용량 체크 타이머를 컨트롤하는 타이머
-        final Timer timerController = new Timer();
-        TimerTask timerControllerTask = new TimerTask() {
-            @Override
-            public void run() {
-                // 작동 여부 공유 변수 가져오기
-                SharedPreferences preferences = activity.getPreferences(MODE_PRIVATE);
-                boolean isRunning = preferences.getBoolean("isRunning", false);
-
-                if(!isRunning){
-                    // 모니터링 중지시킨 경우, 현재 타이머와 네트워크 사용량 체크 타이머 캔슬
-                    timer.cancel();
-                    timerController.cancel();
-                    System.out.println(" Tracking is stopped");
-                }
-            }
-        };
-
-        // 타이머들을 각각 20초, 10로 설정하고 작동
-        timer.schedule(timerTask, 0, 20000);
-        timerController.schedule(timerControllerTask, 0, 10000);
-
-    }
+//    // 일정 시간마다 앱 트래픽 모니터링하는 함수
+//    public void startTracking() {
+//
+//        // 디바이스에 설치된 어플들 이름 저장 및 현재까지 사용한 트래픽 초기화
+//        if(!isInitialized) {
+//            initializeTraffic();
+//        }
+//
+//        // 일정 시간 간격으로 앱별 네트워크 사용량 체크하는 타이머
+//        final Timer timer = new Timer();
+//        TimerTask timerTask = new TimerTask() {
+//            @Override
+//            public void run() {
+//                // 쓰레드 생성
+//                new Thread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//
+//                        updateUsage();
+//                    }
+//                }).start();
+//
+//            }
+//        };
+//
+//        // 네트워크 사용량 체크 타이머를 컨트롤하는 타이머
+//        final Timer timerController = new Timer();
+//        TimerTask timerControllerTask = new TimerTask() {
+//            @Override
+//            public void run() {
+//                // 작동 여부 공유 변수 가져오기
+//                SharedPreferences preferences = activity.getPreferences(MODE_PRIVATE);
+//                boolean isRunning = preferences.getBoolean("isRunning", false);
+//
+//                if(!isRunning){
+//                    // 모니터링 중지시킨 경우, 현재 타이머와 네트워크 사용량 체크 타이머 캔슬
+//                    timer.cancel();
+//                    timerController.cancel();
+//                    System.out.println(" Tracking is stopped");
+//                }
+//            }
+//        };
+//
+//        // 타이머들을 각각 20초, 10로 설정하고 작동
+//        timer.schedule(timerTask, 0, 20000);
+//        timerController.schedule(timerControllerTask, 0, 10000);
+//
+//    }
 
     // 앱별 네트워크 사용량을 구하고 업데이트 하는 함수
     public void updateUsage(){
 
+        if(!isInitialized){
+            initializeTraffic();
+        }
+
         try {
-            Log.v("TrafficMonitor", LocalDateTime.now().toString());
+            Log.v("TrafficMonitor", "Checking - " + LocalDateTime.now().toString());
 
             // 와이파이를 이용한 앱들의 목록과 사용량 구하기
             NetworkStats networkStats =
@@ -225,8 +229,13 @@ public class TrafficMonitor extends AppCompatActivity {
                             // 히스토리 인스턴스 생성 후 히스토리 목록에 추가
                             TrafficDetail trafficDetail = new TrafficDetail(LocalDateTime.now(), appLabel, processName, uid, txBytes, diff);
                             trafficHistory.addTraffic(trafficDetail);
+
+                            Log.v("TrafficMonitor", "before" + LocalDateTime.now().toString());
+
                             // 어댑터 업데이트
                             adapterHistory.notifyDataSetChanged();
+
+                            Log.v("TrafficMonitor", "after" + LocalDateTime.now().toString());
 
                             // 로그 파일에 저장
                             logFileProcessor.writeLog(activity, trafficDetail);
