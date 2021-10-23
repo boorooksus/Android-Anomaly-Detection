@@ -1,12 +1,14 @@
 package com.fos.anomalydetectionapp;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.time.LocalDateTime;
@@ -17,13 +19,13 @@ public class AdapterHistory extends BaseAdapter {
 
     TrafficHistory trafficHistory;  // 트래픽 히스토리 목록 인스턴스
     LayoutInflater layoutInflater;
-    Context context;  // 메인 액티비티 컨텍스트
+    Activity activity;  // 메인 액티비티 컨텍스트
 
     // Constructor
-    public AdapterHistory(Context context, TrafficHistory trafficHistory) {
-        this.context = context;
+    public AdapterHistory(Activity activity, TrafficHistory trafficHistory) {
+        this.activity = activity;
         this.trafficHistory = trafficHistory;
-        layoutInflater = LayoutInflater.from(context);
+        layoutInflater = LayoutInflater.from(activity);
     }
 
     @Override

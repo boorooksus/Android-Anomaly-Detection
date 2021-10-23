@@ -1,22 +1,14 @@
 package com.fos.anomalydetectionapp;
 
-import static android.view.WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.usage.NetworkStats;
 import android.app.usage.NetworkStatsManager;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.net.NetworkCapabilities;
-import android.net.Uri;
 import android.os.RemoteException;
-import android.provider.Settings;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -26,9 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.Vector;
 
 // 트래픽 모니터링 클래스
 public class TrafficMonitor extends AppCompatActivity {
@@ -42,7 +31,7 @@ public class TrafficMonitor extends AppCompatActivity {
     private final PackageManager pm;  // 앱 정보들을 얻기 위한 패키지 매니저
     private static LogInternalFileProcessor logFileProcessor;  // 로그 파일 쓰기 위한 객체
     AdapterHistory adapterHistory;  // 히스토리 리스트뷰 어댑터
-    EventManagement eventManagement;
+    EventManager eventManager;
 
     // Constructor
     public TrafficMonitor(Activity activity, AdapterHistory adapterHistory, TrafficHistory trafficHistory) {
@@ -55,7 +44,7 @@ public class TrafficMonitor extends AppCompatActivity {
         this.activity = activity;
         this.adapterHistory = adapterHistory;
         logFileProcessor = new LogInternalFileProcessor();
-        eventManagement = new EventManagement();
+        eventManager = new EventManager();
 
         pm = activity.getPackageManager();
         networkStatsManager =
@@ -131,25 +120,31 @@ public class TrafficMonitor extends AppCompatActivity {
                             TrafficDetail trafficDetail = new TrafficDetail(LocalDateTime.now(), appLabel, processName, uid, txBytes, diff);
                             trafficHistory.addTraffic(trafficDetail);
 
-                            // 어댑터 업데이트
-                            adapterHistory.notifyDataSetChanged();
+//                            activity.runOnUiThread(new Runnable(){
+//                                @Override
+//                                public void run() {
+//                                    // 어댑터 업데이트
+//                                    adapterHistory.notifyDataSetChanged();
+//                                }
+//                            });
+
 
                             // 로그 파일에 저장
                             logFileProcessor.writeLog(activity, trafficDetail);
 
                             String log = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
                             log += "," + uid + "," + txBytes + "," + diff + "," + appLabel + "," + processName;
-                            Log.v("TrafficMonitor", log);
+                            Log.v("TrafficMonitor1", log);
 
-                            if(eventManagement.checkTouchEvent())
-                                Log.v("TrafficMonitor", "Touch Event Detected");
+                            if(eventManager.checkTouchEvent())
+                                Log.v("TrafficMonitor2", "Touch Event Detected");
                             else
-                                Log.v("TrafficMonitor", "No Touch Event!!!!");
+                                Log.v("TrafficMonitor2", "No Touch Event!!!!");
 
-                            if(eventManagement.checkAudioEvent(activity))
-                                Log.v("TrafficMonitor", "Audio Playing Detected");
+                            if(eventManager.checkAudioEvent(activity))
+                                Log.v("TrafficMonitor3", "Audio Playing Detected");
                             else
-                                Log.v("TrafficMonitor", "No Audio Playing");
+                                Log.v("TrafficMonitor3", "No Audio Playing");
 
                         }
                     });

@@ -23,12 +23,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AnomalyDetectionApp">
         <service
-            android:name=".OverlayService"
-            android:enabled="true"
-            android:exported="true"
-            android:permission="android.permission.SYSTEM_ALERT_WINDOW"/>
-        <service
-            android:name=".TrafficMonitorService"
+            android:name=".ServiceManager"
             android:enabled="true"
             android:exported="true"
             android:permission="android.permission.SYSTEM_ALERT_WINDOW"/>

@@ -1,11 +1,12 @@
 package com.fos.anomalydetectionapp;
 
+import static android.view.WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -19,21 +20,34 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.ListView;
 
-import static android.view.WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
-
+import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
-import java.util.concurrent.TimeUnit;
+import java.time.LocalDateTime;
+import java.util.Timer;
+import java.util.TimerTask;
 
-public class OverlayService extends Service {
+public class ServiceManager extends Service {
+
+    @SuppressLint("StaticFieldLeak")
+    static Activity activity;
+    @SuppressLint("StaticFieldLeak")
+    static AdapterHistory adapterHistory;
+
+    ListView listViewHistory;
+    final Timer timer = new Timer();
 
     WindowManager wm;
     View mView;
-    EventManagement eventManagement = new EventManagement();
+    EventManager eventManager = new EventManager();
 
+    @Nullable
     @Override
-    public IBinder onBind(Intent intent) { return null; }
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
 
     @SuppressLint({"RtlHardcoded", "InflateParams"})
     @Override
@@ -43,23 +57,67 @@ public class OverlayService extends Service {
 
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if(wm != null) {
-            if(mView != null) {
-                wm.removeView(mView);
-                mView = null;
-            }
-            wm = null;
-        }
-    }
-
+    @SuppressLint({"RtlHardcoded", "InflateParams"})
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         setNotification();
 
+        startTrafficMonitoring();
+        createOverlay();
+
+
+        return Service.START_STICKY;
+    }
+
+    public void setArgs(Activity activity) {
+        ServiceManager.activity = activity;
+    }
+
+    public AdapterHistory getAdapterHistory() {
+        return adapterHistory;
+    }
+
+    public void startTrafficMonitoring(){
+        listViewHistory = activity.findViewById(R.id.listViewHistory);
+
+        TrafficHistory trafficHistory = new TrafficHistory();
+        adapterHistory = new AdapterHistory(activity, trafficHistory);
+        final TrafficMonitor trafficMonitor = new TrafficMonitor(activity, adapterHistory, trafficHistory);
+
+        // 일정 시간 간격으로 앱별 네트워크 사용량 체크하는 타이머
+
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                // 쓰레드 생성
+//                new Thread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        Log.v("ServiceManager", "Monitoring... " + LocalDateTime.now().toString());
+//
+//                        trafficMonitor.updateUsage();
+//                    }
+//                }).start();
+
+                trafficMonitor.updateUsage();
+
+                activity.runOnUiThread(new Runnable(){
+                    @Override
+                    public void run() {
+
+                        listViewHistory.setAdapter(adapterHistory);
+                    }
+
+                });
+            }
+        };
+
+        // 타이머들을 각각 20초, 10로 설정하고 작동
+        timer.schedule(timerTask, 0, 20000);
+    }
+
+    public void createOverlay(){
         LayoutInflater inflate = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         wm = (WindowManager) getSystemService(WINDOW_SERVICE);
 
@@ -83,28 +141,22 @@ public class OverlayService extends Service {
             @SuppressLint("ClickableViewAccessibility")
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-
-                int posX = (int)event.getX();
-                int posY = (int)event.getY();
-
 //                Log.v("OverlayService", "TOUCH EVENT OCCURRED! (" + posX + ", " + posY + ")");
 
-                eventManagement.addTouchEvent();
+                eventManager.addTouchEvent();
 
                 return true;
             }
         });
 
         wm.addView(mView, params);
-
-
-        return Service.START_STICKY;
     }
 
     public void setNotification() {
 
+        // Set Notification Channel
         String NOTIFICATION_CHANNEL_ID = "com.fos.anomalydetectionapp";
-        String channelName = "My Background Service";
+        String channelName = "Anomaly Detection Background Service";
         NotificationChannel chan = new NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_NONE);
         chan.setLightColor(Color.BLUE);
         chan.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
@@ -112,6 +164,7 @@ public class OverlayService extends Service {
         assert manager != null;
         manager.createNotificationChannel(chan);
 
+        // set Notification
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
         Notification notification = notificationBuilder.setOngoing(true)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
@@ -120,31 +173,22 @@ public class OverlayService extends Service {
                 .setCategory(Notification.CATEGORY_SERVICE)
                 .build();
         startForeground(2, notification);
+    }
 
-//        Intent notificationIntent = new Intent(this, Activity.class);
-//        PendingIntent pendingIntent =
-//                PendingIntent.getActivity(this, 0, notificationIntent, 0);
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
 
-//        NotificationChannel notificationChannel = new NotificationChannel("notification_id","MyApp notification", NotificationManager.IMPORTANCE_HIGH);
-//
-//        notificationChannel.enableLights(true);
-//        notificationChannel.setLightColor(Color.RED);
-//        notificationChannel.enableVibration(true);
-//        notificationChannel.setDescription("Overlay Tests");
-//
-//        NotificationManager notificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-//        notificationManager.createNotificationChannel(notificationChannel);
-//
-//        Notification notification =
-//                new Notification.Builder(this, "OVERLAY")
-//                        .setContentTitle("OVERLAY_TITLE")
-//                        .setContentText("OVERLAY_MSG")
-////                        .setSmallIcon(R.drawable.ic_launcher_foreground)
-////                        .setContentIntent(pendingIntent)
-////                        .setTicker("OVERLAY_TICKER")
-//                        .build();
-//
-//
-//        startForeground(10, notification);
+        // stop monitoring
+        timer.cancel();
+
+        // terminate overlay
+        if(wm != null) {
+            if(mView != null) {
+                wm.removeView(mView);
+                mView = null;
+            }
+            wm = null;
+        }
     }
 }

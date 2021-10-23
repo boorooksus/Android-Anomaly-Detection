@@ -42,14 +42,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        TrafficMonitorService trafficMonitorService = new TrafficMonitorService();
-        trafficMonitorService.setArgs(MainActivity.this);
+        ServiceManager serviceManager = new ServiceManager();
+        serviceManager.setArgs(MainActivity.this);
 
         // 뷰 id로 불러오기
         buttonStatus = findViewById(R.id.buttonStatus);
         switchTracking = findViewById(R.id.switchTracking);
         listViewHistory = findViewById(R.id.listViewHistory);
-        adapterHistory = trafficMonitorService.getAdapterHistory();
+        adapterHistory = serviceManager.getAdapterHistory();
 
         // 마지막 스위치 상태 가져오기
         SharedPreferences preferences = getPreferences(MODE_PRIVATE);
@@ -68,17 +68,7 @@ public class MainActivity extends AppCompatActivity {
         buttonStatus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                EventManagement eventManagement = new EventManagement();
-//
-//                AudioManager manager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
-//
-//                if (eventManagement.checkAudioEvent(MainActivity.this)){
-//
-//                    Log.v("Main - Audio", "=-=======Audio is Playing");
-//                } else{
-//                    Log.v("Main - Audio", "=-=======Audio is NOT Playing");
-//
-//                }
+                adapterHistory.notifyDataSetChanged();
             }
         });
 
@@ -101,12 +91,12 @@ public class MainActivity extends AppCompatActivity {
 
                         // 모니터링 시작
 
-                        startService(new Intent(MainActivity.this, TrafficMonitorService.class));
+                        startService(new Intent(MainActivity.this, ServiceManager.class));
 
                         // 오버레이 생성
 //                        overlayController.startOverlay();
 //                        startService(new Intent(MainActivity.this, OverlayService.class));
-                        startForegroundService(new Intent(MainActivity.this, OverlayService.class));
+                        startForegroundService(new Intent(MainActivity.this, ServiceManager.class));
 
 //                        trafficMonitor.startTracking();
 
@@ -128,8 +118,8 @@ public class MainActivity extends AppCompatActivity {
 
                     // 오버레이 제거
 //                    overlayController.stopOverlay();
-                    stopService(new Intent(MainActivity.this, OverlayService.class));
-                    stopService(new Intent(MainActivity.this, TrafficMonitorService.class));
+//                    stopService(new Intent(MainActivity.this, OverlayService.class));
+                    stopService(new Intent(MainActivity.this, ServiceManager.class));
                 }
             }
         });
