@@ -37,8 +37,8 @@ public class EventManagement extends AppCompatActivity {
         return diff < 30;
     }
 
-    public boolean checkAudioEvent(){
-        AudioManager manager = (AudioManager)this.getSystemService(AUDIO_SERVICE);
+    public boolean checkAudioEvent(Activity activity){
+        AudioManager manager = (AudioManager)activity.getSystemService(AUDIO_SERVICE);
         return manager.isMusicActive();
     }
 

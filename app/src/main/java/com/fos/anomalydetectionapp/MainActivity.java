@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
 
                 AudioManager manager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
 
-                if (manager.isMusicActive()){
+                if (eventManagement.checkAudioEvent(MainActivity.this)){
 
                     Log.v("Main - Audio", "=-=======Audio is Playing");
                 } else{
