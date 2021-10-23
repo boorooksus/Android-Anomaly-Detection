@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.ListView;
 
 import java.time.LocalDateTime;
 import java.util.Timer;
@@ -19,6 +20,9 @@ public class TrafficMonitorService extends Service {
     @SuppressLint("StaticFieldLeak")
     static AdapterHistory adapterHistory;
 
+    ListView listViewHistory;
+    final Timer timer = new Timer();
+
     @Override
     public IBinder onBind(Intent intent) { return null; }
 
@@ -28,11 +32,24 @@ public class TrafficMonitorService extends Service {
 
         Log.v("TrafficMonitorService", "start monitoring...");
 
-        final TrafficMonitor trafficMonitor = new TrafficMonitor(activity, adapterHistory);
+        listViewHistory = activity.findViewById(R.id.listViewHistory);
 
+        TrafficHistory trafficHistory = new TrafficHistory();
+        adapterHistory = new AdapterHistory(activity, trafficHistory);
+        final TrafficMonitor trafficMonitor = new TrafficMonitor(activity, adapterHistory, trafficHistory);
+
+
+        activity.runOnUiThread(new Runnable(){
+            @Override
+            public void run() {
+
+                listViewHistory.setAdapter(adapterHistory);
+            }
+
+        });
 
         // 일정 시간 간격으로 앱별 네트워크 사용량 체크하는 타이머
-        final Timer timer = new Timer();
+
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
@@ -57,11 +74,16 @@ public class TrafficMonitorService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        timer.cancel();
+        Log.v("TrafficMonitorService", "Stop Monitoring....");
 
     }
 
-    public void setArgs(Activity activity, AdapterHistory adapterHistory) {
+    public void setArgs(Activity activity) {
         TrafficMonitorService.activity = activity;
-        TrafficMonitorService.adapterHistory = adapterHistory;
+    }
+
+    public AdapterHistory getAdapterHistory() {
+        return adapterHistory;
     }
 }

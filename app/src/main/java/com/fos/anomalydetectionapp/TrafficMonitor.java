@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.Vector;
 
 // 트래픽 모니터링 클래스
 public class TrafficMonitor extends AppCompatActivity {
@@ -44,13 +45,13 @@ public class TrafficMonitor extends AppCompatActivity {
     EventManagement eventManagement;
 
     // Constructor
-    public TrafficMonitor(Activity activity, AdapterHistory adapterHistory) {
+    public TrafficMonitor(Activity activity, AdapterHistory adapterHistory, TrafficHistory trafficHistory) {
 
         // 초기화
         appNames = new HashMap<>();
         lastUsage = new HashMap<>();
         isInitialized = false;
-        trafficHistory = new TrafficHistory();
+        this.trafficHistory = trafficHistory;
         this.activity = activity;
         this.adapterHistory = adapterHistory;
         logFileProcessor = new LogInternalFileProcessor();

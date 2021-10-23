@@ -42,11 +42,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        TrafficMonitorService trafficMonitorService = new TrafficMonitorService();
+        trafficMonitorService.setArgs(MainActivity.this);
+
         // 뷰 id로 불러오기
         buttonStatus = findViewById(R.id.buttonStatus);
         switchTracking = findViewById(R.id.switchTracking);
         listViewHistory = findViewById(R.id.listViewHistory);
-        adapterHistory = new AdapterHistory(this);
+        adapterHistory = trafficMonitorService.getAdapterHistory();
 
         // 마지막 스위치 상태 가져오기
         SharedPreferences preferences = getPreferences(MODE_PRIVATE);
@@ -58,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         buttonStatus.setBackgroundColor(Color.parseColor(isRunning ? colorRunning:colorStopped));
 
         // 트래픽 모니터링 클래스
-        final TrafficMonitor trafficMonitor = new TrafficMonitor(MainActivity.this, adapterHistory);
+//        final TrafficMonitor trafficMonitor = new TrafficMonitor(MainActivity.this, adapterHistory);
 //        final OverlayController overlayController = new OverlayController(MainActivity.this);
 
         buttonStatus.setOnClickListener(new View.OnClickListener() {
@@ -96,8 +99,7 @@ public class MainActivity extends AppCompatActivity {
                         editor.apply(); // 스위치 상태 변수 저장
 
                         // 모니터링 시작
-                        TrafficMonitorService trafficMonitorService = new TrafficMonitorService();
-                        trafficMonitorService.setArgs(MainActivity.this, adapterHistory);
+
                         startService(new Intent(MainActivity.this, TrafficMonitorService.class));
 
                         // 오버레이 생성
