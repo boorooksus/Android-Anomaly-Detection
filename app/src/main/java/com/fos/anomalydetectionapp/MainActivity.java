@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
         listViewHistory.setAdapter(adapterHistory);
         switchTracking.setChecked(isRunning);
         buttonStatus.setBackgroundColor(Color.parseColor(isRunning ? colorRunning:colorStopped));
+        buttonStatus.setText(isRunning? "모니터링 작동 중":"모니터링 정지");
 
         // 트래픽 모니터링 클래스
 //        final TrafficMonitor trafficMonitor = new TrafficMonitor(MainActivity.this, adapterHistory);
