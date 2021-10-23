@@ -45,7 +45,7 @@ public class OverlayService extends Service {
                         |WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
                 PixelFormat.TRANSLUCENT);
 
-        params.gravity = Gravity.LEFT | Gravity.TOP;
+        params.gravity = Gravity.LEFT | Gravity.BOTTOM;
 
         mView = inflate.inflate(R.layout.overlay_view, null);
 

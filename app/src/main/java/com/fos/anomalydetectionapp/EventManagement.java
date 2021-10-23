@@ -4,7 +4,9 @@ import static android.view.WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
@@ -34,4 +36,10 @@ public class EventManagement extends AppCompatActivity {
         int diff = (int)ChronoUnit.SECONDS.between(lastTouchTime, LocalDateTime.now());
         return diff < 30;
     }
+
+    public boolean checkAudioEvent(){
+        AudioManager manager = (AudioManager)this.getSystemService(AUDIO_SERVICE);
+        return manager.isMusicActive();
+    }
+
 }

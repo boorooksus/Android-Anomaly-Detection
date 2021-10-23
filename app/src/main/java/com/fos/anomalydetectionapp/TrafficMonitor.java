@@ -41,6 +41,7 @@ public class TrafficMonitor extends AppCompatActivity {
     private final PackageManager pm;  // 앱 정보들을 얻기 위한 패키지 매니저
     private static LogInternalFileProcessor logFileProcessor;  // 로그 파일 쓰기 위한 객체
     AdapterHistory adapterHistory;  // 히스토리 리스트뷰 어댑터
+    EventManagement eventManagement = new EventManagement();
 
     // Constructor
     public TrafficMonitor(Activity activity, AdapterHistory adapterHistory) {
@@ -85,108 +86,6 @@ public class TrafficMonitor extends AppCompatActivity {
 
     }
 
-    // 스토리지 접근 권한 및 앱의 사용 기록 액세스 권한 체크 함수
-    // 권한 있는 경우 true, 없는 경우 유저를 설정 앱으로 보내고 false 리턴
-    public boolean checkPermission(){
-
-        try{
-            // 아래 코드를 실행해 보고 에러가 없다면 권한이 존재
-            // 에러 체크 외에 다른 목적은 없음
-            NetworkStats networkStats =
-                    networkStatsManager.queryDetailsForUid(
-                            NetworkCapabilities.TRANSPORT_WIFI,
-                            "",
-                            0,
-                            System.currentTimeMillis(),
-                            0);
-            networkStats.close();
-
-            return true;
-
-        } catch(Exception e){
-
-            // 위에서 에러가 존재한다면 권한이 제한되어 있음
-            // 유저를 설정 페이지로 보냄
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-
-                    // 알림 생성
-                    AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                    builder.setMessage("앱의 사용 기록 액세스를 허용해주세요");
-                    builder.setPositiveButton(
-                            "확인",
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which)
-                                {
-                                    // 유저를 설정 페이지로 보냄
-//                                    Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS,
-//                                            Uri.parse("package:" + activity.getPackageName()));
-//                                    activity.startActivityForResult(intent, TYPE_APPLICATION_OVERLAY);
-                                    activity.startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
-                                    //ACTION_MANAGE_OVERLAY_PERMISSION
-                                    //finish();
-                                }
-                            });
-
-                    AlertDialog alertDialog = builder.create();
-                    alertDialog.show();
-                }
-            });
-            return false;
-        }
-    }
-
-//    // 일정 시간마다 앱 트래픽 모니터링하는 함수
-//    public void startTracking() {
-//
-//        // 디바이스에 설치된 어플들 이름 저장 및 현재까지 사용한 트래픽 초기화
-//        if(!isInitialized) {
-//            initializeTraffic();
-//        }
-//
-//        // 일정 시간 간격으로 앱별 네트워크 사용량 체크하는 타이머
-//        final Timer timer = new Timer();
-//        TimerTask timerTask = new TimerTask() {
-//            @Override
-//            public void run() {
-//                // 쓰레드 생성
-//                new Thread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//
-//                        updateUsage();
-//                    }
-//                }).start();
-//
-//            }
-//        };
-//
-//        // 네트워크 사용량 체크 타이머를 컨트롤하는 타이머
-//        final Timer timerController = new Timer();
-//        TimerTask timerControllerTask = new TimerTask() {
-//            @Override
-//            public void run() {
-//                // 작동 여부 공유 변수 가져오기
-//                SharedPreferences preferences = activity.getPreferences(MODE_PRIVATE);
-//                boolean isRunning = preferences.getBoolean("isRunning", false);
-//
-//                if(!isRunning){
-//                    // 모니터링 중지시킨 경우, 현재 타이머와 네트워크 사용량 체크 타이머 캔슬
-//                    timer.cancel();
-//                    timerController.cancel();
-//                    System.out.println(" Tracking is stopped");
-//                }
-//            }
-//        };
-//
-//        // 타이머들을 각각 20초, 10로 설정하고 작동
-//        timer.schedule(timerTask, 0, 20000);
-//        timerController.schedule(timerControllerTask, 0, 10000);
-//
-//    }
-
     // 앱별 네트워크 사용량을 구하고 업데이트 하는 함수
     public void updateUsage(){
 
@@ -230,12 +129,8 @@ public class TrafficMonitor extends AppCompatActivity {
                             TrafficDetail trafficDetail = new TrafficDetail(LocalDateTime.now(), appLabel, processName, uid, txBytes, diff);
                             trafficHistory.addTraffic(trafficDetail);
 
-                            Log.v("TrafficMonitor", "before" + LocalDateTime.now().toString());
-
                             // 어댑터 업데이트
                             adapterHistory.notifyDataSetChanged();
-
-                            Log.v("TrafficMonitor", "after" + LocalDateTime.now().toString());
 
                             // 로그 파일에 저장
                             logFileProcessor.writeLog(activity, trafficDetail);
@@ -243,6 +138,14 @@ public class TrafficMonitor extends AppCompatActivity {
                             String log = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
                             log += "," + uid + "," + txBytes + "," + diff + "," + appLabel + "," + processName;
                             Log.v("TrafficMonitor", log);
+
+                            if(eventManagement.checkTouchEvent()){
+                                Log.v("TrafficMonitor", "Safe Traffic");
+
+                            } else{
+                                Log.v("TrafficMonitor", "No User Event!!!!");
+
+                            }
                         }
                     });
                 }

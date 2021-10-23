@@ -12,11 +12,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ListView;
@@ -32,7 +34,6 @@ public class MainActivity extends AppCompatActivity {
     Switch switchTracking;  // 모니터링 온오프 스위치
     ListView listViewHistory;  // 트래픽 히스토리 목록 리스트뷰
     AdapterHistory adapterHistory;  // 리스트뷰 어댑터
-//    Activity activity;  // 메인 액티비티
     String colorRunning = "#41A541";  // 러닝 중일 때 버튼 색상(녹색)
     String colorStopped = "#808080";  // 중단 됐을 때 버튼 색상(회색)
 
@@ -40,8 +41,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-//        activity = this;
 
         // 뷰 id로 불러오기
         buttonStatus = findViewById(R.id.buttonStatus);
@@ -60,22 +59,24 @@ public class MainActivity extends AppCompatActivity {
 
         // 트래픽 모니터링 클래스
         final TrafficMonitor trafficMonitor = new TrafficMonitor(MainActivity.this, adapterHistory);
-        final OverlayController overlayController = new OverlayController(MainActivity.this);
+//        final OverlayController overlayController = new OverlayController(MainActivity.this);
 
-        // ==================
-//        checkPermission();
-//        startService(new Intent(MainActivity.this, OverlayService.class));
-//        Log.v("Main", "start Service");
+        buttonStatus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                EventManagement eventManagement = new EventManagement();
 
-        if(isRunning){
-            // 스위치가 켜져있다면 모니터링 실행
-//            trafficMonitor.startTracking();
+                AudioManager manager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
 
-            // 모니터링 시작
-//            startService(new Intent(MainActivity.this, TrafficMonitorService.class));
-//                        trafficMonitor.startTracking();
-        }
+                if (manager.isMusicActive()){
 
+                    Log.v("Main - Audio", "=-=======Audio is Playing");
+                } else{
+                    Log.v("Main - Audio", "=-=======Audio is NOT Playing");
+
+                }
+            }
+        });
 
         // 모니터링 온오프 스위치 이벤트 리스터
         switchTracking.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -85,40 +86,21 @@ public class MainActivity extends AppCompatActivity {
                     // 스위치 켰을 때
 
                     //  권한 확인
-                    if (overlayController.checkPermission() && trafficMonitor.checkPermission()) {
-                        // 앱 사용 기록 엑세스 권한 있는 경우
+                    PermissionChecker permissionChecker = new PermissionChecker(MainActivity.this);
+                    if (permissionChecker.checkAllPermissions()) {
+                        // 권한 있는 경우
 
                         // 작동 여부 공유 변수 true로 변경
                         SharedPreferences.Editor editor = getPreferences(Context.MODE_PRIVATE).edit();
                         editor.putBoolean("isRunning", true); // 스위치 상태 변수 세팅
                         editor.apply(); // 스위치 상태 변수 저장
 
-
-//                        new Thread(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                startService(new Intent(MainActivity.this, OverlayService.class));
-//
-//
-//                            }
-//                        }).start();
-//
-//                        new Thread(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                startService(new Intent(MainActivity.this, TrafficMonitorService.class));
-//
-//                            }
-//                        }).start();
                         // 모니터링 시작
-                        Log.v("Main", "before...");
                         TrafficMonitorService trafficMonitorService = new TrafficMonitorService();
                         trafficMonitorService.setArgs(MainActivity.this, adapterHistory);
-                        Log.v("Main", "right before...");
                         startService(new Intent(MainActivity.this, TrafficMonitorService.class));
-                        Log.v("Main", "right after...");
 
-                        //                        // 오버레이 생성
+                        // 오버레이 생성
 //                        overlayController.startOverlay();
                         startService(new Intent(MainActivity.this, OverlayService.class));
 
