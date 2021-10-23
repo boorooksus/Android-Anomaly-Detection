@@ -1,9 +1,15 @@
 package com.fos.anomalydetectionapp;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.IBinder;
 import android.util.Log;
@@ -15,6 +21,10 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 
 import static android.view.WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+
+import androidx.core.app.NotificationCompat;
+
+import java.util.concurrent.TimeUnit;
 
 public class OverlayService extends Service {
 
@@ -29,6 +39,26 @@ public class OverlayService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+
+
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(wm != null) {
+            if(mView != null) {
+                wm.removeView(mView);
+                mView = null;
+            }
+            wm = null;
+        }
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+
+        setNotification();
 
         LayoutInflater inflate = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         wm = (WindowManager) getSystemService(WINDOW_SERVICE);
@@ -67,17 +97,54 @@ public class OverlayService extends Service {
 
         wm.addView(mView, params);
 
+
+        return Service.START_STICKY;
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if(wm != null) {
-            if(mView != null) {
-                wm.removeView(mView);
-                mView = null;
-            }
-            wm = null;
-        }
+    public void setNotification() {
+
+        String NOTIFICATION_CHANNEL_ID = "com.fos.anomalydetectionapp";
+        String channelName = "My Background Service";
+        NotificationChannel chan = new NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_NONE);
+        chan.setLightColor(Color.BLUE);
+        chan.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        assert manager != null;
+        manager.createNotificationChannel(chan);
+
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
+        Notification notification = notificationBuilder.setOngoing(true)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setContentTitle("App is running in background")
+                .setPriority(NotificationManager.IMPORTANCE_MIN)
+                .setCategory(Notification.CATEGORY_SERVICE)
+                .build();
+        startForeground(2, notification);
+
+//        Intent notificationIntent = new Intent(this, Activity.class);
+//        PendingIntent pendingIntent =
+//                PendingIntent.getActivity(this, 0, notificationIntent, 0);
+
+//        NotificationChannel notificationChannel = new NotificationChannel("notification_id","MyApp notification", NotificationManager.IMPORTANCE_HIGH);
+//
+//        notificationChannel.enableLights(true);
+//        notificationChannel.setLightColor(Color.RED);
+//        notificationChannel.enableVibration(true);
+//        notificationChannel.setDescription("Overlay Tests");
+//
+//        NotificationManager notificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+//        notificationManager.createNotificationChannel(notificationChannel);
+//
+//        Notification notification =
+//                new Notification.Builder(this, "OVERLAY")
+//                        .setContentTitle("OVERLAY_TITLE")
+//                        .setContentText("OVERLAY_MSG")
+////                        .setSmallIcon(R.drawable.ic_launcher_foreground)
+////                        .setContentIntent(pendingIntent)
+////                        .setTicker("OVERLAY_TICKER")
+//                        .build();
+//
+//
+//        startForeground(10, notification);
     }
 }

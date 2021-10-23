@@ -105,7 +105,8 @@ public class MainActivity extends AppCompatActivity {
 
                         // 오버레이 생성
 //                        overlayController.startOverlay();
-                        startService(new Intent(MainActivity.this, OverlayService.class));
+//                        startService(new Intent(MainActivity.this, OverlayService.class));
+                        startForegroundService(new Intent(MainActivity.this, OverlayService.class));
 
 //                        trafficMonitor.startTracking();
 
