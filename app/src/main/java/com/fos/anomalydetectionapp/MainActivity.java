@@ -22,7 +22,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ListView;
-import android.widget.Switch;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -31,7 +30,6 @@ public class MainActivity extends AppCompatActivity {
 
     Button buttonStatus;  // 목록 새로고침 버튼
     @SuppressLint("UseSwitchCompatOrMaterialCode")
-    Switch switchTracking;  // 모니터링 온오프 스위치
     ListView listViewHistory;  // 트래픽 히스토리 목록 리스트뷰
     AdapterHistory adapterHistory;  // 리스트뷰 어댑터
     String colorRunning = "#41A541";  // 러닝 중일 때 버튼 색상(녹색)
@@ -47,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
 
         // 뷰 id로 불러오기
         buttonStatus = findViewById(R.id.buttonStatus);
-        switchTracking = findViewById(R.id.switchTracking);
         listViewHistory = findViewById(R.id.listViewHistory);
         adapterHistory = serviceManager.getAdapterHistory();
 
@@ -57,7 +54,6 @@ public class MainActivity extends AppCompatActivity {
 
         // 리스트뷰, 스위치, 버튼 세팅
         listViewHistory.setAdapter(adapterHistory);
-        switchTracking.setChecked(isRunning);
         buttonStatus.setBackgroundColor(Color.parseColor(isRunning ? colorRunning:colorStopped));
         buttonStatus.setText(isRunning? "모니터링 작동 중":"모니터링 정지");
 
@@ -65,18 +61,14 @@ public class MainActivity extends AppCompatActivity {
 //        final TrafficMonitor trafficMonitor = new TrafficMonitor(MainActivity.this, adapterHistory);
 //        final OverlayController overlayController = new OverlayController(MainActivity.this);
 
+        if(isRunning){
+            startService(new Intent(MainActivity.this, ServiceManager.class));
+        }
+
         buttonStatus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                adapterHistory.notifyDataSetChanged();
-            }
-        });
-
-        // 모니터링 온오프 스위치 이벤트 리스터
-        switchTracking.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked){
+                if(!preferences.getBoolean("isRunning", false)){
                     // 스위치 켰을 때
 
                     //  권한 확인
@@ -103,9 +95,6 @@ public class MainActivity extends AppCompatActivity {
                         buttonStatus.setBackgroundColor(Color.parseColor(colorRunning));
                         buttonStatus.setText("모니터링 작동 중");
 
-                    } else{
-                        // 앱 사용 기록 엑세스 권한 없는 경우 스위치 다시 끄기
-                        switchTracking.setChecked(false);
                     }
                 }
                 else{
@@ -123,7 +112,15 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+
+
+//        listViewHistory.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                adapterHistory.notifyDataSetChanged();
+//
+//            }
+//        });
     }
-
-
 }

@@ -2,13 +2,11 @@ package com.fos.anomalydetectionapp;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import java.time.LocalDateTime;
@@ -48,7 +46,7 @@ public class AdapterHistory extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         // res/layout/istview_custom.xml 가져옴
-        @SuppressLint("ViewHolder") View view = layoutInflater.inflate(R.layout.listview_custom, null);
+        @SuppressLint("ViewHolder") View view = layoutInflater.inflate(R.layout.listview_traffic, null);
         TrafficDetail trafficDetail = trafficHistory.getTraffic(position);
 
         LocalDateTime time = trafficDetail.getTime();  // 업데이트 시각
