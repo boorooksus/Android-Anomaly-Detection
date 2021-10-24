@@ -20,10 +20,11 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.ListView;
-
+import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AppCompatActivity;
+
+import androidx.appcompat.app.ActionBar;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -34,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
     AdapterHistory adapterHistory;  // 리스트뷰 어댑터
     String colorRunning = "#41A541";  // 러닝 중일 때 버튼 색상(녹색)
     String colorStopped = "#808080";  // 중단 됐을 때 버튼 색상(회색)
+    Toolbar toolbar;
+    ActionBar actionBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +50,15 @@ public class MainActivity extends AppCompatActivity {
         buttonStatus = findViewById(R.id.buttonStatus);
         listViewHistory = findViewById(R.id.listViewHistory);
         adapterHistory = serviceManager.getAdapterHistory();
+
+        // actionbar setting
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        actionBar = getSupportActionBar();
+        assert actionBar != null;
+        actionBar.setDisplayShowCustomEnabled(true);
+        actionBar.setDisplayShowTitleEnabled(false);
+//        actionBar.setDisplayHomeAsUpEnabled(true);
 
         // 마지막 스위치 상태 가져오기
         SharedPreferences preferences = getPreferences(MODE_PRIVATE);
@@ -100,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
                 else{
                     // 스위치 끄면 모니터링 중지
                     buttonStatus.setBackgroundColor(Color.parseColor(colorStopped));
-                    buttonStatus.setText("모니터링 정지");
+                    buttonStatus.setText("모니터링 시작");
                     SharedPreferences.Editor editor = getPreferences(Context.MODE_PRIVATE).edit();
                     editor.putBoolean("isRunning", false); // 스위치 상태 변수 세팅
                     editor.apply(); // 스위치 상태 변수 저장
