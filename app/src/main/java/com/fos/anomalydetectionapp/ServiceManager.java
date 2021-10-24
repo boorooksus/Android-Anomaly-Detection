@@ -42,7 +42,7 @@ public class ServiceManager extends Service {
 
     WindowManager wm;
     View mView;
-    UserEventManager userEventManager = new UserEventManager();
+    UserEventManager userEventManager = new UserEventManager(activity);
 
     @Nullable
     @Override
@@ -110,6 +110,8 @@ public class ServiceManager extends Service {
 //                    }
 //                });
 //                threadMonitoring.start();
+
+                trafficMonitor.initializeTraffic();
 
                 trafficMonitor.updateUsage();
 

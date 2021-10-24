@@ -44,7 +44,7 @@ public class TrafficMonitor extends AppCompatActivity {
         this.activity = activity;
         this.historyAdapter = historyAdapter;
         logFileProcessor = new LogInternalFileProcessor();
-        userEventManager = new UserEventManager();
+        userEventManager = new UserEventManager(activity);
 
         pm = activity.getPackageManager();
         networkStatsManager =
@@ -57,35 +57,34 @@ public class TrafficMonitor extends AppCompatActivity {
     public void initializeTraffic(){
 
         // 쓰레드 생성
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                // 디바이스에 설치된 앱들의 app process name, 앱 이름 매핑해서 리스트에 저장
-                @SuppressLint("QueryPermissionsNeeded") List<ApplicationInfo> apps = pm.getInstalledApplications(0);
-                for (ApplicationInfo app : apps) {
-                    String appName = app.loadLabel(pm).toString();
-                    String processName = app.processName;
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                // 디바이스에 설치된 앱들의 app process name, 앱 이름 매핑해서 리스트에 저장
+//                @SuppressLint("QueryPermissionsNeeded") List<ApplicationInfo> apps = pm.getInstalledApplications(0);
+//                for (ApplicationInfo app : apps) {
+//                    String appName = app.loadLabel(pm).toString();
+//                    String processName = app.processName;
+//
+//                    appNames.put(processName, appName);
+//                }
+//
+//                // 현재까지 앱별로 데이터 사용량 저장
+////                updateUsage();
+//
+//            }
+//        }).start();
 
-                    appNames.put(processName, appName);
-                }
+        // 디바이스에 설치된 앱들의 app process name, 앱 이름 매핑해서 리스트에 저장
+        @SuppressLint("QueryPermissionsNeeded") List<ApplicationInfo> apps = pm.getInstalledApplications(0);
+        for (ApplicationInfo app : apps) {
+            String appName = app.loadLabel(pm).toString();
+            String processName = app.processName;
 
-                // 현재까지 앱별로 데이터 사용량 저장
-//                updateUsage();
-
-            }
-        }).start();
-
-    }
-
-    // 앱별 네트워크 사용량을 구하고 업데이트 하는 함수
-    public void updateUsage(){
-
-        if(!isInitialized){
-            initializeTraffic();
+            appNames.put(processName, appName);
         }
 
         try {
-            Log.v("TrafficMonitor", "Checking - " + LocalDateTime.now().toString());
 
             // 와이파이를 이용한 앱들의 목록과 사용량 구하기
             NetworkStats networkStats =
@@ -110,6 +109,57 @@ public class TrafficMonitor extends AppCompatActivity {
                     continue;
                 }
 
+                // 앱의 마지막 네트워크 사용량 업데이트
+                lastUsage.put(processName, txBytes);
+
+
+            } while (networkStats.hasNextBucket());
+
+            networkStats.close();
+
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+        // 한 번이라도 여기까지 진행된다면 초기화가 완료된 것임
+        isInitialized = true;
+
+    }
+
+    // 앱별 네트워크 사용량을 구하고 업데이트 하는 함수
+    public void updateUsage(){
+
+//        if(!isInitialized){
+//            initializeTraffic();
+//        }
+
+        try {
+            Log.v("TrafficMonitor", "Checking - " + LocalDateTime.now().toString());
+
+            // 와이파이를 이용한 앱들의 목록과 사용량 구하기
+            NetworkStats networkStats =
+                    networkStatsManager.querySummary(NetworkCapabilities.TRANSPORT_WIFI,
+                            "",
+                            0,
+                            System.currentTimeMillis());
+            do {
+                NetworkStats.Bucket bucket = new NetworkStats.Bucket();
+                networkStats.getNextBucket(bucket);
+
+                final int uid = bucket.getUid();  // 앱 uid
+                final String processName = pm.getNameForUid(uid);
+
+                // 앱 정보 얻기
+                final String appLabel = Optional.ofNullable(appNames.get(processName)).orElse("untitled");  // 앱 레이블(기본 이름)
+                final long txBytes = bucket.getTxBytes();  // 현재까지 보낸 트래픽 총량
+                final long diff = txBytes - Optional.ofNullable(lastUsage.get(processName)).orElse((long) 0);  // 증가한 트래픽 양
+                final int risk = userEventManager.getRisk();
+
+                if(diff <= 0){
+                    // 앱 네트워크 사용량에 변동이 없는 경우 continue
+                    continue;
+                }
+
                 // 현재 함수가 lastUsage 컬렉션 초기화를 위해 실행중인 경우에는 히스토리 목록에 넣지 않는다
                 if(isInitialized){
                     // 초기화가 이미 이루어진 경우 히스토리 목록 업데이트
@@ -117,7 +167,7 @@ public class TrafficMonitor extends AppCompatActivity {
                         @Override
                         public void run() {
                             // 히스토리 인스턴스 생성 후 히스토리 목록에 추가
-                            TrafficDetail trafficDetail = new TrafficDetail(LocalDateTime.now(), appLabel, processName, uid, txBytes, diff);
+                            TrafficDetail trafficDetail = new TrafficDetail(LocalDateTime.now(), appLabel, processName, uid, txBytes, diff, risk);
                             trafficHistory.addTraffic(trafficDetail);
 
 //                            activity.runOnUiThread(new Runnable(){
@@ -133,7 +183,7 @@ public class TrafficMonitor extends AppCompatActivity {
                             logFileProcessor.writeLog(activity, trafficDetail);
 
                             String log = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-                            log += "," + uid + "," + txBytes + "," + diff + "," + appLabel + "," + processName;
+                            log += "," + uid + "," + txBytes + "," + diff + "," + risk + "," + appLabel + "," + processName;
                             Log.v("TrafficMonitor1", log);
 
                             if(userEventManager.checkTouchEvent())
@@ -141,7 +191,7 @@ public class TrafficMonitor extends AppCompatActivity {
                             else
                                 Log.v("TrafficMonitor2", "No Touch Event!!!!");
 
-                            if(userEventManager.checkAudioEvent(activity))
+                            if(userEventManager.checkAudioEvent())
                                 Log.v("TrafficMonitor3", "Audio Playing Detected");
                             else
                                 Log.v("TrafficMonitor3", "No Audio Playing!!!!");
@@ -162,7 +212,7 @@ public class TrafficMonitor extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        // 한 번이라도 여기까지 진행된다면 초기화가 완료된 것임
-        isInitialized = true;
+//        // 한 번이라도 여기까지 진행된다면 초기화가 완료된 것임
+//        isInitialized = true;
     }
 }

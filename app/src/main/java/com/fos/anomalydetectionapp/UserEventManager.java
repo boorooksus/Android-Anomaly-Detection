@@ -23,11 +23,23 @@ import java.util.Vector;
 
 public class UserEventManager extends AppCompatActivity {
 
+    Activity activity;
     private static LocalDateTime lastTouchTime = LocalDateTime.now();  // 터치 이벤트 저장
+
+    public UserEventManager(Activity activity) {
+        this.activity = activity;
+    }
 
     // 터치 이벤트 추가
     public void addTouchEvent(){
         lastTouchTime = LocalDateTime.now();
+    }
+
+    public int getRisk(){
+        if (checkTouchEvent()) return 1;
+        else if (checkAudioEvent()) return 2;
+
+        return 4;
     }
 
     public boolean checkTouchEvent(){
@@ -37,7 +49,7 @@ public class UserEventManager extends AppCompatActivity {
         return diff < 30;
     }
 
-    public boolean checkAudioEvent(Activity activity){
+    public boolean checkAudioEvent(){
         AudioManager manager = (AudioManager)activity.getSystemService(AUDIO_SERVICE);
         return manager.isMusicActive();
     }

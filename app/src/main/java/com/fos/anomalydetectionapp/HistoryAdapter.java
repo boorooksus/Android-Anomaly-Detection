@@ -54,11 +54,13 @@ public class HistoryAdapter extends BaseAdapter {
         int uid = trafficDetail.getUid();  // 앱 uid
         long usage = trafficDetail.getUsage();  // 앱 사용량
         long diff = trafficDetail.getDiff();  // 앱 트래픽 증가양
+        int risk = trafficDetail.getRisk();  // 위험도
 
         TextView viewTime = view.findViewById(R.id.textViewTime);  // 시간
         TextView viewName = view.findViewById(R.id.textViewName);  // 앱 이름
         TextView viewUid = view.findViewById(R.id.textViewUid);  // 앱 uid
         TextView viewUsage = view.findViewById(R.id.textViewUsage);  // 트래픽 사용량
+        TextView viewRisk = view.findViewById(R.id.textViewRisk); // 위험도
 
         // 리스트뷰에 히스토리 정보 세팅
         viewTime.setText(time.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
@@ -66,6 +68,7 @@ public class HistoryAdapter extends BaseAdapter {
         viewName.setTypeface(null, Typeface.BOLD);
         viewUid.setText("UID: " + uid);
         viewUsage.setText("Usage: " + usage + " (+" + diff + ") bytes");
+        viewRisk.setText("Degree of Risk: " + risk);
 
         return view;
     }

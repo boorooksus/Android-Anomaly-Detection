@@ -34,7 +34,7 @@ public class LogInternalFileProcessor implements LogFileProcessor{
                 BufferedWriter bw = new BufferedWriter( fw );
 
                 // 각 항목들의 타이틀
-                String[] titles = new String[]{"time", "uid", "usage", "increase", "app label", "app name"};
+                String[] titles = new String[]{"time", "uid", "usage", "increase", "risk", "app label", "app name"};
 
                 for (String title: titles){
                     bw.write(title);
@@ -60,9 +60,10 @@ public class LogInternalFileProcessor implements LogFileProcessor{
             int uid = trafficDetail.getUid();  // 앱 uid
             long usage = trafficDetail.getUsage();  // 앱 사용량
             long diff = trafficDetail.getDiff();  // 앱 트래픽 증가양
+            int risk = trafficDetail.getRisk();
 
             String log = time.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-            log += "," + uid + "," + usage + "," + diff + "," + name + "," + processName;
+            log += "," + uid + "," + usage + "," + diff + "," + risk + "," + name + "," + processName;
             Log.v("LogInternalFileProcessor", log);
 
             bw.write(log);
