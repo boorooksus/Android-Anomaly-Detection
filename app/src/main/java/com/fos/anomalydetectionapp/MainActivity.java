@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
     ListView listViewHistory;  // 트래픽 히스토리 목록 리스트뷰
     AdapterHistory adapterHistory;  // 리스트뷰 어댑터
     String colorRunning = "#41A541";  // 러닝 중일 때 버튼 색상(녹색)
-    String colorStopped = "#808080";  // 중단 됐을 때 버튼 색상(회색)
+    String colorStopped = "#FFFFFF";  // 중단 됐을 때 버튼 색상(회색)
     Toolbar toolbar;
     ActionBar actionBar;
 
@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         // 리스트뷰, 스위치, 버튼 세팅
         listViewHistory.setAdapter(adapterHistory);
         buttonStatus.setBackgroundColor(Color.parseColor(isRunning ? colorRunning:colorStopped));
-        buttonStatus.setText(isRunning? "모니터링 작동 중":"모니터링 정지");
+        buttonStatus.setText(isRunning? "모니터링 작동 중":"모니터링 시작");
 
         // 트래픽 모니터링 클래스
 //        final TrafficMonitor trafficMonitor = new TrafficMonitor(MainActivity.this, adapterHistory);
