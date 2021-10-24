@@ -111,7 +111,7 @@ public class ServiceManager extends Service {
 //                });
 //                threadMonitoring.start();
 
-                trafficMonitor.initializeTraffic();
+//                trafficMonitor.initializeTraffic();
 
                 trafficMonitor.updateUsage();
 

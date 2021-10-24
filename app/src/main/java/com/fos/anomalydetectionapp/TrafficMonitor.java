@@ -56,91 +56,92 @@ public class TrafficMonitor extends AppCompatActivity {
     // 디바이스에 설치된 어플들 이름 저장 및 현재까지 사용한 트래픽 초기화
     public void initializeTraffic(){
 
-        // 쓰레드 생성
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                // 디바이스에 설치된 앱들의 app process name, 앱 이름 매핑해서 리스트에 저장
-//                @SuppressLint("QueryPermissionsNeeded") List<ApplicationInfo> apps = pm.getInstalledApplications(0);
-//                for (ApplicationInfo app : apps) {
-//                    String appName = app.loadLabel(pm).toString();
-//                    String processName = app.processName;
-//
-//                    appNames.put(processName, appName);
-//                }
-//
-//                // 현재까지 앱별로 데이터 사용량 저장
-////                updateUsage();
-//
-//            }
-//        }).start();
+//         쓰레드 생성
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // 디바이스에 설치된 앱들의 app process name, 앱 이름 매핑해서 리스트에 저장
+                @SuppressLint("QueryPermissionsNeeded") List<ApplicationInfo> apps = pm.getInstalledApplications(0);
+                for (ApplicationInfo app : apps) {
+                    String appName = app.loadLabel(pm).toString();
+                    String processName = app.processName;
 
-        // 디바이스에 설치된 앱들의 app process name, 앱 이름 매핑해서 리스트에 저장
-        @SuppressLint("QueryPermissionsNeeded") List<ApplicationInfo> apps = pm.getInstalledApplications(0);
-        for (ApplicationInfo app : apps) {
-            String appName = app.loadLabel(pm).toString();
-            String processName = app.processName;
-
-            appNames.put(processName, appName);
-        }
-
-        try {
-
-            // 와이파이를 이용한 앱들의 목록과 사용량 구하기
-            NetworkStats networkStats =
-                    networkStatsManager.querySummary(NetworkCapabilities.TRANSPORT_WIFI,
-                            "",
-                            0,
-                            System.currentTimeMillis());
-            do {
-                NetworkStats.Bucket bucket = new NetworkStats.Bucket();
-                networkStats.getNextBucket(bucket);
-
-                final int uid = bucket.getUid();  // 앱 uid
-                final String processName = pm.getNameForUid(uid);
-
-                // 앱 정보 얻기
-                final String appLabel = Optional.ofNullable(appNames.get(processName)).orElse("untitled");  // 앱 레이블(기본 이름)
-                final long txBytes = bucket.getTxBytes();  // 현재까지 보낸 트래픽 총량
-                final long diff = txBytes - Optional.ofNullable(lastUsage.get(processName)).orElse((long) 0);  // 증가한 트래픽 양
-
-                if(diff <= 0){
-                    // 앱 네트워크 사용량에 변동이 없는 경우 continue
-                    continue;
+                    appNames.put(processName, appName);
                 }
 
-                // 앱의 마지막 네트워크 사용량 업데이트
-                lastUsage.put(processName, txBytes);
+                // 현재까지 앱별로 데이터 사용량 저장
+//                updateUsage();
 
+            }
+        }).start();
 
-            } while (networkStats.hasNextBucket());
-
-            networkStats.close();
-
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-
-        // 한 번이라도 여기까지 진행된다면 초기화가 완료된 것임
-        isInitialized = true;
+        // 디바이스에 설치된 앱들의 app process name, 앱 이름 매핑해서 리스트에 저장
+//        @SuppressLint("QueryPermissionsNeeded") List<ApplicationInfo> apps = pm.getInstalledApplications(0);
+//        for (ApplicationInfo app : apps) {
+//            String appName = app.loadLabel(pm).toString();
+//            String processName = app.processName;
+//
+//            appNames.put(processName, appName);
+//        }
+//
+//        try {
+//
+//            // 와이파이를 이용한 앱들의 목록과 사용량 구하기
+//            NetworkStats networkStats =
+//                    networkStatsManager.querySummary(NetworkCapabilities.TRANSPORT_WIFI,
+//                            "",
+//                            System.currentTimeMillis() - 20000,
+//                            System.currentTimeMillis());
+//            do {
+//                NetworkStats.Bucket bucket = new NetworkStats.Bucket();
+//                networkStats.getNextBucket(bucket);
+//
+//                final int uid = bucket.getUid();  // 앱 uid
+//                final String processName = pm.getNameForUid(uid);
+//
+//                // 앱 정보 얻기
+//                final String appLabel = Optional.ofNullable(appNames.get(processName)).orElse("untitled");  // 앱 레이블(기본 이름)
+//                final long txBytes = bucket.getTxBytes();  // 현재까지 보낸 트래픽 총량
+//                final long diff = txBytes - Optional.ofNullable(lastUsage.get(processName)).orElse((long) 0);  // 증가한 트래픽 양
+//
+//                if(diff <= 0){
+//                    // 앱 네트워크 사용량에 변동이 없는 경우 continue
+//                    continue;
+//                }
+//
+//                // 앱의 마지막 네트워크 사용량 업데이트
+//                lastUsage.put(processName, txBytes);
+//
+//
+//            } while (networkStats.hasNextBucket());
+//
+//            networkStats.close();
+//
+//        } catch (RemoteException e) {
+//            e.printStackTrace();
+//        }
+//
+//        // 한 번이라도 여기까지 진행된다면 초기화가 완료된 것임
+//        isInitialized = true;
 
     }
 
     // 앱별 네트워크 사용량을 구하고 업데이트 하는 함수
     public void updateUsage(){
 
-//        if(!isInitialized){
-//            initializeTraffic();
-//        }
+        if(!isInitialized){
+            initializeTraffic();
+        }
 
         try {
             Log.v("TrafficMonitor", "Checking - " + LocalDateTime.now().toString());
+//            Log.v("TrafficMonitor", "initialized: " + isInitialized);
 
             // 와이파이를 이용한 앱들의 목록과 사용량 구하기
             NetworkStats networkStats =
                     networkStatsManager.querySummary(NetworkCapabilities.TRANSPORT_WIFI,
                             "",
-                            0,
+                            System.currentTimeMillis() - 20000,
                             System.currentTimeMillis());
             do {
                 NetworkStats.Bucket bucket = new NetworkStats.Bucket();
@@ -213,6 +214,6 @@ public class TrafficMonitor extends AppCompatActivity {
         }
 
 //        // 한 번이라도 여기까지 진행된다면 초기화가 완료된 것임
-//        isInitialized = true;
+        isInitialized = true;
     }
 }
