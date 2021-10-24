@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Stack;
 import java.util.Vector;
 
-public class EventManager extends AppCompatActivity {
+public class UserEventManager extends AppCompatActivity {
 
     private static LocalDateTime lastTouchTime = LocalDateTime.now();  // 터치 이벤트 저장
 

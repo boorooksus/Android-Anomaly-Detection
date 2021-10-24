@@ -13,14 +13,14 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 // 네트워크 히스토리 리스트뷰 어댑터
-public class AdapterHistory extends BaseAdapter {
+public class HistoryAdapter extends BaseAdapter {
 
     TrafficHistory trafficHistory;  // 트래픽 히스토리 목록 인스턴스
     LayoutInflater layoutInflater;
     Activity activity;  // 메인 액티비티 컨텍스트
 
     // Constructor
-    public AdapterHistory(Activity activity, TrafficHistory trafficHistory) {
+    public HistoryAdapter(Activity activity, TrafficHistory trafficHistory) {
         this.activity = activity;
         this.trafficHistory = trafficHistory;
         layoutInflater = LayoutInflater.from(activity);

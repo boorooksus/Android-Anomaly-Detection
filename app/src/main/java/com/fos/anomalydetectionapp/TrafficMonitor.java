@@ -30,11 +30,11 @@ public class TrafficMonitor extends AppCompatActivity {
     private final Activity activity;  // 메인 액티비티 context
     private final PackageManager pm;  // 앱 정보들을 얻기 위한 패키지 매니저
     private static LogInternalFileProcessor logFileProcessor;  // 로그 파일 쓰기 위한 객체
-    AdapterHistory adapterHistory;  // 히스토리 리스트뷰 어댑터
-    EventManager eventManager;
+    HistoryAdapter historyAdapter;  // 히스토리 리스트뷰 어댑터
+    UserEventManager userEventManager;
 
     // Constructor
-    public TrafficMonitor(Activity activity, AdapterHistory adapterHistory, TrafficHistory trafficHistory) {
+    public TrafficMonitor(Activity activity, HistoryAdapter historyAdapter, TrafficHistory trafficHistory) {
 
         // 초기화
         appNames = new HashMap<>();
@@ -42,9 +42,9 @@ public class TrafficMonitor extends AppCompatActivity {
         isInitialized = false;
         this.trafficHistory = trafficHistory;
         this.activity = activity;
-        this.adapterHistory = adapterHistory;
+        this.historyAdapter = historyAdapter;
         logFileProcessor = new LogInternalFileProcessor();
-        eventManager = new EventManager();
+        userEventManager = new UserEventManager();
 
         pm = activity.getPackageManager();
         networkStatsManager =
@@ -136,15 +136,15 @@ public class TrafficMonitor extends AppCompatActivity {
                             log += "," + uid + "," + txBytes + "," + diff + "," + appLabel + "," + processName;
                             Log.v("TrafficMonitor1", log);
 
-                            if(eventManager.checkTouchEvent())
+                            if(userEventManager.checkTouchEvent())
                                 Log.v("TrafficMonitor2", "Touch Event Detected");
                             else
                                 Log.v("TrafficMonitor2", "No Touch Event!!!!");
 
-                            if(eventManager.checkAudioEvent(activity))
+                            if(userEventManager.checkAudioEvent(activity))
                                 Log.v("TrafficMonitor3", "Audio Playing Detected");
                             else
-                                Log.v("TrafficMonitor3", "No Audio Playing");
+                                Log.v("TrafficMonitor3", "No Audio Playing!!!!");
 
                         }
                     });

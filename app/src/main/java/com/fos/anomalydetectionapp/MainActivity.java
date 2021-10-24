@@ -1,23 +1,11 @@
 package com.fos.anomalydetectionapp;
 
-import static android.view.WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
-
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Service;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.media.AudioManager;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
@@ -32,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
     Button buttonStatus;  // 목록 새로고침 버튼
     @SuppressLint("UseSwitchCompatOrMaterialCode")
     ListView listViewHistory;  // 트래픽 히스토리 목록 리스트뷰
-    AdapterHistory adapterHistory;  // 리스트뷰 어댑터
+    HistoryAdapter historyAdapter;  // 리스트뷰 어댑터
     String colorRunning = "#41A541";  // 러닝 중일 때 버튼 색상(녹색)
     String colorStopped = "#FFFFFF";  // 중단 됐을 때 버튼 색상(회색)
     Toolbar toolbar;
@@ -49,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
         // 뷰 id로 불러오기
         buttonStatus = findViewById(R.id.buttonStatus);
         listViewHistory = findViewById(R.id.listViewHistory);
-        adapterHistory = serviceManager.getAdapterHistory();
+        historyAdapter = serviceManager.getAdapterHistory();
 
         // actionbar setting
         toolbar = findViewById(R.id.toolbar);
@@ -65,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         boolean isRunning = preferences.getBoolean("isRunning", false);  // 스위치가 켜졌는지 여부
 
         // 리스트뷰, 스위치, 버튼 세팅
-        listViewHistory.setAdapter(adapterHistory);
+        listViewHistory.setAdapter(historyAdapter);
         buttonStatus.setBackgroundColor(Color.parseColor(isRunning ? colorRunning:colorStopped));
         buttonStatus.setText(isRunning? "Monitoring...":"Start");
 

@@ -34,14 +34,15 @@ public class ServiceManager extends Service {
     @SuppressLint("StaticFieldLeak")
     static Activity activity;
     @SuppressLint("StaticFieldLeak")
-    static AdapterHistory adapterHistory;
+    static HistoryAdapter historyAdapter;
 
     ListView listViewHistory;
     final Timer timer = new Timer();
+    Thread threadMonitoring;
 
     WindowManager wm;
     View mView;
-    EventManager eventManager = new EventManager();
+    UserEventManager userEventManager = new UserEventManager();
 
     @Nullable
     @Override
@@ -74,16 +75,16 @@ public class ServiceManager extends Service {
         ServiceManager.activity = activity;
     }
 
-    public AdapterHistory getAdapterHistory() {
-        return adapterHistory;
+    public HistoryAdapter getAdapterHistory() {
+        return historyAdapter;
     }
 
     public void startTrafficMonitoring(){
         listViewHistory = activity.findViewById(R.id.listViewHistory);
 
         TrafficHistory trafficHistory = new TrafficHistory();
-        adapterHistory = new AdapterHistory(activity, trafficHistory);
-        final TrafficMonitor trafficMonitor = new TrafficMonitor(activity, adapterHistory, trafficHistory);
+        historyAdapter = new HistoryAdapter(activity, trafficHistory);
+        final TrafficMonitor trafficMonitor = new TrafficMonitor(activity, historyAdapter, trafficHistory);
 
         // 일정 시간 간격으로 앱별 네트워크 사용량 체크하는 타이머
 
@@ -91,14 +92,24 @@ public class ServiceManager extends Service {
             @Override
             public void run() {
                 // 쓰레드 생성
-//                new Thread(new Runnable() {
+//                threadMonitoring = new Thread(new Runnable() {
 //                    @Override
 //                    public void run() {
 //                        Log.v("ServiceManager", "Monitoring... " + LocalDateTime.now().toString());
 //
 //                        trafficMonitor.updateUsage();
+//
+//                        activity.runOnUiThread(new Runnable(){
+//                            @Override
+//                            public void run() {
+//
+//                                listViewHistory.setAdapter(historyAdapter);
+//                            }
+//
+//                        });
 //                    }
-//                }).start();
+//                });
+//                threadMonitoring.start();
 
                 trafficMonitor.updateUsage();
 
@@ -106,7 +117,7 @@ public class ServiceManager extends Service {
                     @Override
                     public void run() {
 
-                        listViewHistory.setAdapter(adapterHistory);
+                        listViewHistory.setAdapter(historyAdapter);
                     }
 
                 });
@@ -143,7 +154,7 @@ public class ServiceManager extends Service {
             public boolean onTouch(View v, MotionEvent event) {
 //                Log.v("OverlayService", "TOUCH EVENT OCCURRED! (" + posX + ", " + posY + ")");
 
-                eventManager.addTouchEvent();
+                userEventManager.addTouchEvent();
 
                 return true;
             }
@@ -180,6 +191,7 @@ public class ServiceManager extends Service {
         super.onDestroy();
 
         // stop monitoring
+//        threadMonitoring.interrupt();
         timer.cancel();
 
         // terminate overlay
