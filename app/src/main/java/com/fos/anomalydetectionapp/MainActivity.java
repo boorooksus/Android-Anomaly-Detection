@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         // 리스트뷰, 스위치, 버튼 세팅
         listViewHistory.setAdapter(adapterHistory);
         buttonStatus.setBackgroundColor(Color.parseColor(isRunning ? colorRunning:colorStopped));
-        buttonStatus.setText(isRunning? "모니터링 작동 중":"모니터링 시작");
+        buttonStatus.setText(isRunning? "Monitoring...":"Start");
 
         // 트래픽 모니터링 클래스
 //        final TrafficMonitor trafficMonitor = new TrafficMonitor(MainActivity.this, adapterHistory);
@@ -105,14 +105,14 @@ public class MainActivity extends AppCompatActivity {
 //                        trafficMonitor.startTracking();
 
                         buttonStatus.setBackgroundColor(Color.parseColor(colorRunning));
-                        buttonStatus.setText("모니터링 작동 중");
+                        buttonStatus.setText("Monitoring...");
 
                     }
                 }
                 else{
                     // 스위치 끄면 모니터링 중지
                     buttonStatus.setBackgroundColor(Color.parseColor(colorStopped));
-                    buttonStatus.setText("모니터링 시작");
+                    buttonStatus.setText("Start");
                     SharedPreferences.Editor editor = getPreferences(Context.MODE_PRIVATE).edit();
                     editor.putBoolean("isRunning", false); // 스위치 상태 변수 세팅
                     editor.apply(); // 스위치 상태 변수 저장

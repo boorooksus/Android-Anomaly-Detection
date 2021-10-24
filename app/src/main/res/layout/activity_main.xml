@@ -50,7 +50,7 @@
             android:layout_weight="1"
             android:layout_marginHorizontal="5dp"
             android:textColor="#000010"
-            android:text="화이트리스트" />
+            android:text="Whitelist" />
 
         <!--        <Space-->
         <!--            android:layout_width="5dp"-->
@@ -66,7 +66,7 @@
             android:layout_marginHorizontal="5dp"
             android:backgroundTint="#FFFFFF"
             android:textColor="#000010"
-            android:text="모니터링 시작" />
+            android:text="Start" />
 
     </LinearLayout>
 
