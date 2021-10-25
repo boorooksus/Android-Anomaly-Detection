@@ -6,11 +6,14 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.hardware.display.DisplayManager;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.PowerManager;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.Display;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -62,6 +65,21 @@ public class UserEventManager extends AppCompatActivity {
     public boolean checkAudioEvent(){
         AudioManager manager = (AudioManager)activity.getSystemService(AUDIO_SERVICE);
         return manager.isMusicActive();
+    }
+
+    public boolean checkScreenOn(){
+//        DisplayManager dm = (DisplayManager) activity.getSystemService(Context.DISPLAY_SERVICE);
+//        boolean screenOn = false;
+//        for (Display display : dm.getDisplays()) {
+//            if (display.getState() != Display.STATE_OFF) {
+//                screenOn = true;
+//            }
+//        }
+//        return screenOn;
+
+        PowerManager pm = (PowerManager) activity.getSystemService(Context.POWER_SERVICE);
+        return pm.isInteractive();
+
     }
 
 }

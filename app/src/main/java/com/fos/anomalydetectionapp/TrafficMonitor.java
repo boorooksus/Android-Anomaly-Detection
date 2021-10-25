@@ -94,7 +94,7 @@ public class TrafficMonitor extends AppCompatActivity {
 
         try {
             Log.v("TrafficMonitor", "Checking - " + LocalDateTime.now().toString());
-//            Log.v("TrafficMonitor", "initialized: " + isInitialized);
+
 
             // 와이파이를 이용한 앱들의 목록과 사용량 구하기
             NetworkStats networkStats =
@@ -159,6 +159,11 @@ public class TrafficMonitor extends AppCompatActivity {
                                 Log.v("TrafficMonitor3", "Audio Playing Detected");
                             else
                                 Log.v("TrafficMonitor3", "No Audio Playing!!!!");
+
+                            if(userEventManager.checkScreenOn())
+                                Log.v("TrafficMonitor4", "Screen On");
+                            else
+                                Log.v("TrafficMonitor4", "Screen Off!!!!");
 
                         }
                     });
