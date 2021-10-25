@@ -108,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
                     // 오버레이 제거
 //                    overlayController.stopOverlay();
 //                    stopService(new Intent(MainActivity.this, OverlayService.class));
+                    startService(new Intent(MainActivity.this, ServiceManager.class));
                     stopService(new Intent(MainActivity.this, ServiceManager.class));
                 }
             }
