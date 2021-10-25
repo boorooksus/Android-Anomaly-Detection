@@ -44,7 +44,7 @@ public class ServiceManager extends Service {
 
     WindowManager wm;
     View mView;
-    UserEventManager userEventManager = new UserEventManager(activity);
+    UserEventManager userEventManager;
     SharedPreferences preferences;
 
     @Nullable
@@ -76,7 +76,9 @@ public class ServiceManager extends Service {
 
         trafficHistory = new TrafficHistory();
         historyAdapter = new HistoryAdapter(activity, trafficHistory);
-        AppsManager appsManager = new AppsManager(activity);
+//        AppsManager appsManager = new AppsManager(activity);
+        AppsManager appsManager = new AppsManager();
+        userEventManager = new UserEventManager(activity, appsManager);
         trafficMonitor = new TrafficMonitor(activity, historyAdapter, trafficHistory);
 
         startTrafficMonitoring();

@@ -35,6 +35,11 @@ public class MainActivity extends AppCompatActivity {
         ServiceManager serviceManager = new ServiceManager();
         serviceManager.setArgs(MainActivity.this);
 
+        AppsManager appsManager = new AppsManager();
+
+        appsManager.setArgs(MainActivity.this);
+        appsManager.initializeApps();
+
         // 뷰 id로 불러오기
         buttonStatus = findViewById(R.id.buttonStatus);
         buttonWhitelist = findViewById(R.id.buttonWhiteList);

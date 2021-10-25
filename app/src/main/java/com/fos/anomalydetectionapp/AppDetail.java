@@ -28,7 +28,7 @@ public class AppDetail {
         return appProcessName;
     }
 
-    public boolean isInWhitelist() {
+    public boolean getIsInWhitelist() {
         return isInWhitelist;
     }
 

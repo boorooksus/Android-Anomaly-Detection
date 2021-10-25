@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Vector;
 
 public class AppsManager extends AppCompatActivity {
@@ -24,14 +25,22 @@ public class AppsManager extends AppCompatActivity {
 //    WhitelistAdapter whitelistAdapter;
 //    private static HashMap<String, Boolean> appSafeties;
 //    private static Object[] appNames;
-    private final PackageManager pm;
+
 
     private static ArrayList<AppDetail> appDetails;
+    private static HashMap<String, Integer> appIndex;
 
-    public AppsManager(Activity activity) {
-        this.activity = activity;
-        pm = activity.getPackageManager();
+//    public AppsManager(Activity activity) {
+//    public AppsManager() {
+////        this.activity = activity;
+//
+//
+//    }
+
+    public void initializeApps(){
+        PackageManager pm = activity.getPackageManager();
         appDetails = new ArrayList<>();
+        appIndex = new HashMap<>();
 
         @SuppressLint("QueryPermissionsNeeded") List<ApplicationInfo> apps = pm.getInstalledApplications(0);
         int i = 0;
@@ -46,9 +55,14 @@ public class AppsManager extends AppCompatActivity {
 
             AppDetail appDetail = new AppDetail(i, appName, processName, isSafe);
             appDetails.add(appDetail);
+            appIndex.put(processName, i);
             i++;
         }
+    }
 
+
+    public void setArgs(Activity activity){
+        this.activity = activity;
     }
 
     public void setAppDetail(int position, boolean isSafe){
@@ -65,6 +79,10 @@ public class AppsManager extends AppCompatActivity {
     // 특정 인덱스의 트래픽 내역 리턴
     public AppDetail getAppDetail(int position){
         return appDetails.get(position);
+    }
+
+    public int getIndex(String processName){
+        return Optional.ofNullable(appIndex.get(processName)).orElse(-1);
     }
 
 

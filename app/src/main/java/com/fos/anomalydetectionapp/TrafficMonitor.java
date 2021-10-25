@@ -37,6 +37,7 @@ public class TrafficMonitor extends AppCompatActivity {
     UserEventManager userEventManager;
     Timer timer;
     ListView listViewHistory;
+    AppsManager appsManager;
 
 
     // Constructor
@@ -50,7 +51,8 @@ public class TrafficMonitor extends AppCompatActivity {
         this.activity = activity;
         this.historyAdapter = historyAdapter;
         logFileProcessor = new LogInternalFileProcessor();
-        userEventManager = new UserEventManager(activity);
+        appsManager = new AppsManager();
+        userEventManager = new UserEventManager(activity, appsManager);
         timer = new Timer();
         listViewHistory = activity.findViewById(R.id.listViewHistory);
 
@@ -111,7 +113,7 @@ public class TrafficMonitor extends AppCompatActivity {
                 final String appLabel = Optional.ofNullable(appNames.get(processName)).orElse("untitled");  // 앱 레이블(기본 이름)
                 final long usage = bucket.getTxBytes();  // 현재까지 보낸 트래픽 총량
                 final long diff = usage - Optional.ofNullable(lastUsage.get(processName)).orElse((long) 0);  // 증가한 트래픽 양
-                final int risk = userEventManager.getRisk();
+                final int risk = userEventManager.getRisk(processName);
 
                 if(diff <= 0){
                     // 앱 네트워크 사용량에 변동이 없는 경우 continue

@@ -2,19 +2,14 @@ package com.fos.anomalydetectionapp;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Intent;
-import android.graphics.Typeface;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 // 네트워크 히스토리 리스트뷰 어댑터
@@ -59,7 +54,7 @@ public class WhitelistAdapter extends BaseAdapter {
 
         String appName = Optional.ofNullable(appDetail.getAppLabel()).orElse("untitled");
         String appProcessName = Optional.ofNullable(appDetail.getAppProcessName()).orElse("untitled");
-        isInWhitelist = appDetail.isInWhitelist();
+        isInWhitelist = appDetail.getIsInWhitelist();
 
         TextView viewName = view.findViewById(R.id.appName);
         TextView viewProcessName = view.findViewById(R.id.appProcessName);
@@ -76,7 +71,8 @@ public class WhitelistAdapter extends BaseAdapter {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                isInWhitelist = !isInWhitelist;
+
+                isInWhitelist = !appDetail.getIsInWhitelist();
 
                 appsManager.setAppDetail(position, isInWhitelist);
 

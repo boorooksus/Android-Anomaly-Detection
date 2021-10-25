@@ -32,7 +32,11 @@ public class WhitelistActivity extends AppCompatActivity {
         actionBar.setDisplayShowTitleEnabled(false);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        AppsManager appsManager = new AppsManager(WhitelistActivity.this);
+//        AppsManager appsManager = new AppsManager(WhitelistActivity.this);
+        AppsManager appsManager = new AppsManager();
+
+//        appsManager.setArgs(WhitelistActivity.this);
+//        appsManager.initializeApps();
 
         listViewWhitelist = findViewById(R.id.listViewWhitelist);
         whitelistAdapter = new WhitelistAdapter(WhitelistActivity.this, appsManager);
