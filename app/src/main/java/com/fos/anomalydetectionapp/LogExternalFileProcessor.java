@@ -96,10 +96,9 @@ public class LogExternalFileProcessor implements LogFileProcessor {
             String processName = trafficDetail.getAppProcessName();  // 앱 이름
             int uid = trafficDetail.getUid();  // 앱 uid
             long usage = trafficDetail.getUsage();  // 앱 사용량
-            long diff = trafficDetail.getDiff();  // 앱 트래픽 증가양
 
             String data = time.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-            data += "," + uid + "," + usage + "," + diff + "," + name + "," + processName;
+            data += "," + uid + "," + usage + "," + name + "," + processName;
             Log.v("", data);
 
             bw.write(data);

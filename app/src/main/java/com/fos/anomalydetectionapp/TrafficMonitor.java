@@ -175,7 +175,7 @@ public class TrafficMonitor extends AppCompatActivity {
                         @Override
                         public void run() {
                             // 히스토리 인스턴스 생성 후 히스토리 목록에 추가
-                            TrafficDetail trafficDetail = new TrafficDetail(LocalDateTime.now(), appLabel, processName, uid, txBytes, diff, risk);
+                            TrafficDetail trafficDetail = new TrafficDetail(LocalDateTime.now(), appLabel, processName, uid, txBytes, risk);
                             trafficHistory.addTraffic(trafficDetail);
 
                             activity.runOnUiThread(new Runnable(){
@@ -192,7 +192,7 @@ public class TrafficMonitor extends AppCompatActivity {
                             logFileProcessor.writeLog(activity, trafficDetail);
 
                             String log = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-                            log += "," + uid + "," + txBytes + "," + diff + "," + risk + "," + appLabel + "," + processName;
+                            log += "," + uid + "," + txBytes + "," + risk + "," + appLabel + "," + processName;
                             Log.v("TrafficMonitor1", log);
 
                             if(userEventManager.checkTouchEvent())
@@ -231,39 +231,7 @@ public class TrafficMonitor extends AppCompatActivity {
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
-                // 쓰레드 생성
-//                threadMonitoring = new Thread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        Log.v("ServiceManager", "Monitoring... " + LocalDateTime.now().toString());
-//
-//                        trafficMonitor.updateUsage();
-//
-//                        activity.runOnUiThread(new Runnable(){
-//                            @Override
-//                            public void run() {
-//
-//                                listViewHistory.setAdapter(historyAdapter);
-//                            }
-//
-//                        });
-//                    }
-//                });
-//                threadMonitoring.start();
-
-//                trafficMonitor.initializeTraffic();
-
                 detectTraffic();
-
-//                activity.runOnUiThread(new Runnable(){
-//                    @Override
-//                    public void run() {
-//
-//                        historyAdapter.notifyDataSetChanged();
-////                        listViewHistory.setAdapter(historyAdapter);
-//                    }
-//
-//                });
             }
         };
 

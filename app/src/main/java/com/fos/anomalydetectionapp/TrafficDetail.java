@@ -8,18 +8,16 @@ public class TrafficDetail {
     private final String appLabel;  // 앱 레이블(기본 이름)
     private final String appProcessName;  // 앱 이름(상세 이름)
     private final int uid;  // uid
-    private final long usage;  // 네트워크 사용 총량
-    private final long diff;  // 증가된 네트워크 양
+    private final long usage;  // 송신 트래픽 발생량
     private final int risk;  // 위험도
 
     // Constructor
-    public TrafficDetail(LocalDateTime time, String appLabel, String appProcessName, int uid, long usage, long diff, int risk) {
+    public TrafficDetail(LocalDateTime time, String appLabel, String appProcessName, int uid, long usage, int risk) {
         this.time = time;
         this.appLabel = appLabel;
         this.appProcessName = appProcessName;
         this.uid = uid;
         this.usage = usage;
-        this.diff = diff;
         this.risk = risk;
     }
 
@@ -45,7 +43,6 @@ public class TrafficDetail {
         return usage;
     }
 
-    public long getDiff() { return diff; }
 
     public int getRisk() {
         return risk;
