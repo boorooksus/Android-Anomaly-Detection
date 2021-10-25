@@ -38,6 +38,7 @@ public class TrafficMonitor extends AppCompatActivity {
     Timer timer;
     ListView listViewHistory;
 
+
     // Constructor
     public TrafficMonitor(Activity activity, HistoryAdapter historyAdapter, TrafficHistory trafficHistory) {
 
@@ -52,6 +53,7 @@ public class TrafficMonitor extends AppCompatActivity {
         userEventManager = new UserEventManager(activity);
         timer = new Timer();
         listViewHistory = activity.findViewById(R.id.listViewHistory);
+
 
         pm = activity.getPackageManager();
         networkStatsManager =
@@ -76,60 +78,8 @@ public class TrafficMonitor extends AppCompatActivity {
                     appNames.put(processName, appName);
                 }
 
-                // 현재까지 앱별로 데이터 사용량 저장
-//                updateUsage();
-
             }
         }).start();
-
-        // 디바이스에 설치된 앱들의 app process name, 앱 이름 매핑해서 리스트에 저장
-//        @SuppressLint("QueryPermissionsNeeded") List<ApplicationInfo> apps = pm.getInstalledApplications(0);
-//        for (ApplicationInfo app : apps) {
-//            String appName = app.loadLabel(pm).toString();
-//            String processName = app.processName;
-//
-//            appNames.put(processName, appName);
-//        }
-//
-//        try {
-//
-//            // 와이파이를 이용한 앱들의 목록과 사용량 구하기
-//            NetworkStats networkStats =
-//                    networkStatsManager.querySummary(NetworkCapabilities.TRANSPORT_WIFI,
-//                            "",
-//                            System.currentTimeMillis() - 20000,
-//                            System.currentTimeMillis());
-//            do {
-//                NetworkStats.Bucket bucket = new NetworkStats.Bucket();
-//                networkStats.getNextBucket(bucket);
-//
-//                final int uid = bucket.getUid();  // 앱 uid
-//                final String processName = pm.getNameForUid(uid);
-//
-//                // 앱 정보 얻기
-//                final String appLabel = Optional.ofNullable(appNames.get(processName)).orElse("untitled");  // 앱 레이블(기본 이름)
-//                final long txBytes = bucket.getTxBytes();  // 현재까지 보낸 트래픽 총량
-//                final long diff = txBytes - Optional.ofNullable(lastUsage.get(processName)).orElse((long) 0);  // 증가한 트래픽 양
-//
-//                if(diff <= 0){
-//                    // 앱 네트워크 사용량에 변동이 없는 경우 continue
-//                    continue;
-//                }
-//
-//                // 앱의 마지막 네트워크 사용량 업데이트
-//                lastUsage.put(processName, txBytes);
-//
-//
-//            } while (networkStats.hasNextBucket());
-//
-//            networkStats.close();
-//
-//        } catch (RemoteException e) {
-//            e.printStackTrace();
-//        }
-//
-//        // 한 번이라도 여기까지 진행된다면 초기화가 완료된 것임
-//        isInitialized = true;
 
     }
 
@@ -159,8 +109,8 @@ public class TrafficMonitor extends AppCompatActivity {
 
                 // 앱 정보 얻기
                 final String appLabel = Optional.ofNullable(appNames.get(processName)).orElse("untitled");  // 앱 레이블(기본 이름)
-                final long txBytes = bucket.getTxBytes();  // 현재까지 보낸 트래픽 총량
-                final long diff = txBytes - Optional.ofNullable(lastUsage.get(processName)).orElse((long) 0);  // 증가한 트래픽 양
+                final long usage = bucket.getTxBytes();  // 현재까지 보낸 트래픽 총량
+                final long diff = usage - Optional.ofNullable(lastUsage.get(processName)).orElse((long) 0);  // 증가한 트래픽 양
                 final int risk = userEventManager.getRisk();
 
                 if(diff <= 0){
@@ -175,24 +125,27 @@ public class TrafficMonitor extends AppCompatActivity {
                         @Override
                         public void run() {
                             // 히스토리 인스턴스 생성 후 히스토리 목록에 추가
-                            TrafficDetail trafficDetail = new TrafficDetail(LocalDateTime.now(), appLabel, processName, uid, txBytes, risk);
+
+                            TrafficDetail trafficDetail = new TrafficDetail(LocalDateTime.now(), appLabel, processName, uid, usage, risk);
                             trafficHistory.addTraffic(trafficDetail);
 
-                            activity.runOnUiThread(new Runnable(){
-                                @Override
-                                public void run() {
-                                    // 어댑터 업데이트
-//                                    historyAdapter.notifyDataSetChanged();
-                                    listViewHistory.setAdapter(historyAdapter);
-                                }
-                            });
+//                            activity.runOnUiThread(new Runnable(){
+//                                @Override
+//                                public void run() {
+//                                    // 어댑터 업데이트
+////                                    adapterHistory.notifyDataSetChanged();
+//                                    listViewHistory.setAdapter(historyAdapter);
+//                                }
+//                            });
 
 
                             // 로그 파일에 저장
                             logFileProcessor.writeLog(activity, trafficDetail);
 
                             String log = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-                            log += "," + uid + "," + txBytes + "," + risk + "," + appLabel + "," + processName;
+
+                            log += "," + uid + "," + usage + "," + risk + "," + appLabel + "," + processName;
+
                             Log.v("TrafficMonitor1", log);
 
                             if(userEventManager.checkTouchEvent())
@@ -210,7 +163,7 @@ public class TrafficMonitor extends AppCompatActivity {
                 }
 
                 // 앱의 마지막 네트워크 사용량 업데이트
-                lastUsage.put(processName, txBytes);
+                lastUsage.put(processName, usage);
 
 
             } while (networkStats.hasNextBucket());
@@ -225,22 +178,32 @@ public class TrafficMonitor extends AppCompatActivity {
         isInitialized = true;
     }
 
-    public void startMonitoring(){
+//    public void startMonitoring(){
+//
+//        timer = new Timer();
+//        TimerTask timerTask = new TimerTask() {
+//            @Override
+//            public void run() {
+//                detectTraffic();
+//
+//                activity.runOnUiThread(new Runnable(){
+//                    @Override
+//                    public void run() {
+//                        // 어댑터 업데이트
+//                        listViewHistory.setAdapter(historyAdapter);
+//                    }
+//                });
+//            }
+//        };
+//
+//        // 타이머들을 각각 20초, 10로 설정하고 작동
+//        timer.schedule(timerTask, 0, 20000);
+//    }
 
-        final Timer timer = new Timer();
-        TimerTask timerTask = new TimerTask() {
-            @Override
-            public void run() {
-                detectTraffic();
-            }
-        };
-
-        // 타이머들을 각각 20초, 10로 설정하고 작동
-        timer.schedule(timerTask, 0, 20000);
-    }
-
-    public void stopMonitoring(){
-        timer.cancel();
-
-    }
+//    public void stopMonitoring(){
+//
+//        if(timer != null)
+//            timer.cancel();
+//
+//    }
 }

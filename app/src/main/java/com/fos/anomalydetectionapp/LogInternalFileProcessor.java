@@ -58,7 +58,7 @@ public class LogInternalFileProcessor implements LogFileProcessor{
             String name = trafficDetail.getAppLabel();
             String processName = trafficDetail.getAppProcessName();  // 앱 이름
             int uid = trafficDetail.getUid();  // 앱 uid
-            long usage = trafficDetail.getUsage();  // 트래픽 발생량
+            long usage = trafficDetail.getUsage();  // 앱 사용량
             int risk = trafficDetail.getRisk();
 
             String log = time.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));

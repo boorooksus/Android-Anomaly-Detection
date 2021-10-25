@@ -46,7 +46,6 @@ public class MainActivity extends AppCompatActivity {
         assert actionBar != null;
         actionBar.setDisplayShowCustomEnabled(true);
         actionBar.setDisplayShowTitleEnabled(false);
-//        actionBar.setDisplayHomeAsUpEnabled(true);
 
         // 마지막 스위치 상태 가져오기
         SharedPreferences preferences = getPreferences(MODE_PRIVATE);
@@ -57,12 +56,8 @@ public class MainActivity extends AppCompatActivity {
         buttonStatus.setBackgroundColor(Color.parseColor(isRunning ? colorRunning:colorStopped));
         buttonStatus.setText(isRunning? "Monitoring...":"Start");
 
-        // 트래픽 모니터링 클래스
-//        final TrafficMonitor trafficMonitor = new TrafficMonitor(MainActivity.this, adapterHistory);
-//        final OverlayController overlayController = new OverlayController(MainActivity.this);
-
         if(isRunning){
-            startService(new Intent(MainActivity.this, ServiceManager.class));
+            startForegroundService(new Intent(MainActivity.this, ServiceManager.class));
         }
 
         buttonStatus.setOnClickListener(new View.OnClickListener() {
@@ -82,15 +77,7 @@ public class MainActivity extends AppCompatActivity {
                         editor.apply(); // 스위치 상태 변수 저장
 
                         // 모니터링 시작
-
-                        startService(new Intent(MainActivity.this, ServiceManager.class));
-
-                        // 오버레이 생성
-//                        overlayController.startOverlay();
-//                        startService(new Intent(MainActivity.this, OverlayService.class));
                         startForegroundService(new Intent(MainActivity.this, ServiceManager.class));
-
-//                        trafficMonitor.startTracking();
 
                         buttonStatus.setBackgroundColor(Color.parseColor(colorRunning));
                         buttonStatus.setText("Monitoring...");
@@ -106,9 +93,10 @@ public class MainActivity extends AppCompatActivity {
                     editor.apply(); // 스위치 상태 변수 저장
 
                     // 오버레이 제거
-//                    overlayController.stopOverlay();
-//                    stopService(new Intent(MainActivity.this, OverlayService.class));
+//                    startService(new Intent(MainActivity.this, ServiceManager.class));
                     stopService(new Intent(MainActivity.this, ServiceManager.class));
+
+
                 }
             }
         });

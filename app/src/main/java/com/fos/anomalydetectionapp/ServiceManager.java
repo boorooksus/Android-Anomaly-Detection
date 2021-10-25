@@ -10,9 +10,11 @@ import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -35,7 +37,7 @@ public class ServiceManager extends Service {
     static HistoryAdapter historyAdapter;
 
     ListView listViewHistory;
-    final Timer timer = new Timer();
+    static Timer timer;
     Thread threadMonitoring;
     TrafficHistory trafficHistory;
     TrafficMonitor trafficMonitor;
@@ -43,6 +45,7 @@ public class ServiceManager extends Service {
     WindowManager wm;
     View mView;
     UserEventManager userEventManager = new UserEventManager(activity);
+    SharedPreferences preferences;
 
     @Nullable
     @Override
@@ -62,6 +65,13 @@ public class ServiceManager extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
+//        Log.v("Service", "=======Service is Started...");
+
+//        if (intent.getAction().equals("stop")) {
+//            stopForeground(true);
+//            stopSelf();
+//        }
+
         setNotification();
 
         trafficHistory = new TrafficHistory();
@@ -69,8 +79,8 @@ public class ServiceManager extends Service {
         trafficMonitor = new TrafficMonitor(activity, historyAdapter, trafficHistory);
 
 
-//        startTrafficMonitoring();
-        trafficMonitor.startMonitoring();
+        startTrafficMonitoring();
+//        trafficMonitor.startMonitoring();
         createOverlay();
 
 
@@ -88,52 +98,33 @@ public class ServiceManager extends Service {
     public void startTrafficMonitoring(){
         listViewHistory = activity.findViewById(R.id.listViewHistory);
 
-//        TrafficHistory trafficHistory = new TrafficHistory();
-//        historyAdapter = new HistoryAdapter(activity, trafficHistory);
-//        final TrafficMonitor trafficMonitor = new TrafficMonitor(activity, historyAdapter, trafficHistory);
-
         // 일정 시간 간격으로 앱별 네트워크 사용량 체크하는 타이머
 
-//        TimerTask timerTask = new TimerTask() {
-//            @Override
-//            public void run() {
-//                // 쓰레드 생성
-////                threadMonitoring = new Thread(new Runnable() {
-////                    @Override
-////                    public void run() {
-////                        Log.v("ServiceManager", "Monitoring... " + LocalDateTime.now().toString());
-////
-////                        trafficMonitor.updateUsage();
-////
-////                        activity.runOnUiThread(new Runnable(){
-////                            @Override
-////                            public void run() {
-////
-////                                listViewHistory.setAdapter(historyAdapter);
-////                            }
-////
-////                        });
-////                    }
-////                });
-////                threadMonitoring.start();
-//
-////                trafficMonitor.initializeTraffic();
-//
-//                trafficMonitor.detectTraffic();
-//
-//                activity.runOnUiThread(new Runnable(){
-//                    @Override
-//                    public void run() {
-//
-//                        listViewHistory.setAdapter(historyAdapter);
-//                    }
-//
-//                });
-//            }
-//        };
-//
-//        // 타이머들을 각각 20초, 10로 설정하고 작동
-//        timer.schedule(timerTask, 0, 20000);
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+
+                if(trafficMonitor != null)
+                    trafficMonitor.detectTraffic();
+
+                activity.runOnUiThread(new Runnable(){
+                    @Override
+                    public void run() {
+
+                        listViewHistory.setAdapter(historyAdapter);
+                    }
+
+                });
+
+//                if (preferences != null && !preferences.getBoolean("isRunning", false))
+//                    timer.cancel();
+            }
+        };
+
+
+        timer = new Timer();
+        // 타이머들을 각각 20초, 10로 설정하고 작동
+        timer.schedule(timerTask, 0, 20000);
     }
 
     public void createOverlay(){
@@ -160,7 +151,6 @@ public class ServiceManager extends Service {
             @SuppressLint("ClickableViewAccessibility")
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-//                Log.v("OverlayService", "TOUCH EVENT OCCURRED! (" + posX + ", " + posY + ")");
 
                 userEventManager.addTouchEvent();
 
@@ -194,16 +184,32 @@ public class ServiceManager extends Service {
         startForeground(2, notification);
     }
 
+//    public void stopForegroundService(){
+//
+//        stopForeground(true);
+//        stopSelf();
+//
+//        if(timer != null)
+//            timer.cancel();
+//
+//        if(wm != null) {
+//            if(mView != null) {
+//                wm.removeView(mView);
+//                mView = null;
+//            }
+//            wm = null;
+//        }
+//
+//    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
-
         // stop monitoring
-//        threadMonitoring.interrupt()
+//        threadMonitoring.interrupt();
 
-        trafficMonitor.stopMonitoring();
-
-//        timer.cancel();
+//        trafficMonitor.stopMonitoring();
+        timer.cancel();
 
 
         // terminate overlay
@@ -214,5 +220,8 @@ public class ServiceManager extends Service {
             }
             wm = null;
         }
+
+        stopForeground(true);
+        stopSelf();
     }
 }

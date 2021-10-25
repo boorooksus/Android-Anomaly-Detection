@@ -43,7 +43,6 @@ public class TrafficDetail {
         return usage;
     }
 
-
     public int getRisk() {
         return risk;
     }

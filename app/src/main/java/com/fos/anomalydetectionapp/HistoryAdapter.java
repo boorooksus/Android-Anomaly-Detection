@@ -52,7 +52,7 @@ public class HistoryAdapter extends BaseAdapter {
         LocalDateTime time = trafficDetail.getTime();  // 업데이트 시각
         String name = trafficDetail.getAppLabel() + " (" + trafficDetail.getAppProcessName() + ")";  // 앱 이름
         int uid = trafficDetail.getUid();  // 앱 uid
-        long usage = trafficDetail.getUsage();  // 앱 트래픽 발생량
+        long usage = trafficDetail.getUsage();  // 앱 사용량
         int risk = trafficDetail.getRisk();  // 위험도
 
         TextView viewTime = view.findViewById(R.id.textViewTime);  // 시간
