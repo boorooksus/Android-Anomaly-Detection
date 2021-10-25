@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.net.NetworkCapabilities;
 import android.os.RemoteException;
 import android.util.Log;
+import android.widget.ListView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import java.time.LocalDateTime;
@@ -18,6 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Timer;
+import java.util.TimerTask;
 
 // 트래픽 모니터링 클래스
 public class TrafficMonitor extends AppCompatActivity {
@@ -32,6 +35,8 @@ public class TrafficMonitor extends AppCompatActivity {
     private static LogInternalFileProcessor logFileProcessor;  // 로그 파일 쓰기 위한 객체
     HistoryAdapter historyAdapter;  // 히스토리 리스트뷰 어댑터
     UserEventManager userEventManager;
+    Timer timer;
+    ListView listViewHistory;
 
     // Constructor
     public TrafficMonitor(Activity activity, HistoryAdapter historyAdapter, TrafficHistory trafficHistory) {
@@ -45,6 +50,8 @@ public class TrafficMonitor extends AppCompatActivity {
         this.historyAdapter = historyAdapter;
         logFileProcessor = new LogInternalFileProcessor();
         userEventManager = new UserEventManager(activity);
+        timer = new Timer();
+        listViewHistory = activity.findViewById(R.id.listViewHistory);
 
         pm = activity.getPackageManager();
         networkStatsManager =
@@ -127,7 +134,7 @@ public class TrafficMonitor extends AppCompatActivity {
     }
 
     // 앱별 네트워크 사용량을 구하고 업데이트 하는 함수
-    public void updateUsage(){
+    public void detectTraffic(){
 
         if(!isInitialized){
             initializeTraffic();
@@ -171,13 +178,14 @@ public class TrafficMonitor extends AppCompatActivity {
                             TrafficDetail trafficDetail = new TrafficDetail(LocalDateTime.now(), appLabel, processName, uid, txBytes, diff, risk);
                             trafficHistory.addTraffic(trafficDetail);
 
-//                            activity.runOnUiThread(new Runnable(){
-//                                @Override
-//                                public void run() {
-//                                    // 어댑터 업데이트
-//                                    adapterHistory.notifyDataSetChanged();
-//                                }
-//                            });
+                            activity.runOnUiThread(new Runnable(){
+                                @Override
+                                public void run() {
+                                    // 어댑터 업데이트
+//                                    historyAdapter.notifyDataSetChanged();
+                                    listViewHistory.setAdapter(historyAdapter);
+                                }
+                            });
 
 
                             // 로그 파일에 저장
@@ -215,5 +223,56 @@ public class TrafficMonitor extends AppCompatActivity {
 
 //        // 한 번이라도 여기까지 진행된다면 초기화가 완료된 것임
         isInitialized = true;
+    }
+
+    public void startMonitoring(){
+
+        final Timer timer = new Timer();
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                // 쓰레드 생성
+//                threadMonitoring = new Thread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        Log.v("ServiceManager", "Monitoring... " + LocalDateTime.now().toString());
+//
+//                        trafficMonitor.updateUsage();
+//
+//                        activity.runOnUiThread(new Runnable(){
+//                            @Override
+//                            public void run() {
+//
+//                                listViewHistory.setAdapter(historyAdapter);
+//                            }
+//
+//                        });
+//                    }
+//                });
+//                threadMonitoring.start();
+
+//                trafficMonitor.initializeTraffic();
+
+                detectTraffic();
+
+//                activity.runOnUiThread(new Runnable(){
+//                    @Override
+//                    public void run() {
+//
+//                        historyAdapter.notifyDataSetChanged();
+////                        listViewHistory.setAdapter(historyAdapter);
+//                    }
+//
+//                });
+            }
+        };
+
+        // 타이머들을 각각 20초, 10로 설정하고 작동
+        timer.schedule(timerTask, 0, 20000);
+    }
+
+    public void stopMonitoring(){
+        timer.cancel();
+
     }
 }
