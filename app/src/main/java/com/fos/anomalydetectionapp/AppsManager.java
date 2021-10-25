@@ -78,6 +78,7 @@ public class AppsManager extends AppCompatActivity {
 
     // 특정 인덱스의 트래픽 내역 리턴
     public AppDetail getAppDetail(int position){
+        if (position < 0 || position >= getLength()) return null;
         return appDetails.get(position);
     }
 
