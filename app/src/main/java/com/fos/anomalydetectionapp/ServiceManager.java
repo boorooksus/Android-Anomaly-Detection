@@ -76,8 +76,8 @@ public class ServiceManager extends Service {
 
         trafficHistory = new TrafficHistory();
         historyAdapter = new HistoryAdapter(activity, trafficHistory);
+        AppsManager appsManager = new AppsManager(activity);
         trafficMonitor = new TrafficMonitor(activity, historyAdapter, trafficHistory);
-
 
         startTrafficMonitoring();
 //        trafficMonitor.startMonitoring();
@@ -91,7 +91,7 @@ public class ServiceManager extends Service {
         ServiceManager.activity = activity;
     }
 
-    public HistoryAdapter getAdapterHistory() {
+    public HistoryAdapter getHistoryAdapter() {
         return historyAdapter;
     }
 

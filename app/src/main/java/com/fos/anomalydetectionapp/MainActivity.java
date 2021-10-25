@@ -18,6 +18,7 @@ import androidx.appcompat.app.ActionBar;
 public class MainActivity extends AppCompatActivity {
 
     Button buttonStatus;  // 목록 새로고침 버튼
+    Button buttonWhitelist;
     @SuppressLint("UseSwitchCompatOrMaterialCode")
     ListView listViewHistory;  // 트래픽 히스토리 목록 리스트뷰
     HistoryAdapter historyAdapter;  // 리스트뷰 어댑터
@@ -36,8 +37,9 @@ public class MainActivity extends AppCompatActivity {
 
         // 뷰 id로 불러오기
         buttonStatus = findViewById(R.id.buttonStatus);
+        buttonWhitelist = findViewById(R.id.buttonWhiteList);
         listViewHistory = findViewById(R.id.listViewHistory);
-        historyAdapter = serviceManager.getAdapterHistory();
+        historyAdapter = serviceManager.getHistoryAdapter();
 
         // actionbar setting
         toolbar = findViewById(R.id.toolbar);
@@ -101,14 +103,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-
-//        listViewHistory.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                adapterHistory.notifyDataSetChanged();
-//
-//            }
-//        });
+        buttonWhitelist.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), WhitelistActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 }
