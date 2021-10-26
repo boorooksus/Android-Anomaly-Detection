@@ -37,6 +37,9 @@ public class AppsManager extends AppCompatActivity {
 
     public void initializeApps(){
 
+        if(appDetails != null)
+            return;
+
         PackageManager pm = activity.getPackageManager();
         appDetails = new ArrayList<>();
         appIndex = new HashMap<>();

@@ -39,10 +39,10 @@ public class MainActivity extends AppCompatActivity {
 
         AppsManager appsManager = new AppsManager();
 
-        if(permissionChecker.checkAllPermissions()) {
-            appsManager.setArgs(MainActivity.this);
-            appsManager.initializeApps();
-        }
+//        if(permissionChecker.checkAllPermissions()) {
+//            appsManager.setArgs(MainActivity.this);
+//            appsManager.initializeApps();
+//        }
 
         // 뷰 id로 불러오기
         buttonStatus = findViewById(R.id.buttonStatus);
@@ -69,11 +69,15 @@ public class MainActivity extends AppCompatActivity {
         buttonStatus.setText(isRunning? "Monitoring":"Start");
 
         if(isRunning){
+
             appsManager.setArgs(MainActivity.this);
             appsManager.initializeApps();
 
             startForegroundService(new Intent(MainActivity.this, ServiceManager.class));
         }
+//        else{
+//            buttonWhitelist.setEnabled(false);
+//        }
 
         buttonStatus.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -87,6 +91,8 @@ public class MainActivity extends AppCompatActivity {
 
                         appsManager.setArgs(MainActivity.this);
                         appsManager.initializeApps();
+
+//                        buttonWhitelist.setEnabled(true);
 
                         // 작동 여부 공유 변수 true로 변경
                         SharedPreferences.Editor editor = getPreferences(Context.MODE_PRIVATE).edit();
@@ -123,6 +129,9 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 if(permissionChecker.checkAllPermissions()) {
+
+                    appsManager.setArgs(MainActivity.this);
+                    appsManager.initializeApps();
 
                     Intent intent = new Intent(getApplicationContext(), WhitelistActivity.class);
                     startActivity(intent);
