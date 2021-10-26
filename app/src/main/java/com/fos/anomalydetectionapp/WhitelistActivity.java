@@ -16,6 +16,7 @@ public class WhitelistActivity extends AppCompatActivity {
     ActionBar actionBar;
     ListView listViewWhitelist;
     WhitelistAdapter whitelistAdapter;
+    AppsManager appsManager;
 
 
     @Override
@@ -33,7 +34,7 @@ public class WhitelistActivity extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
 
 //        AppsManager appsManager = new AppsManager(WhitelistActivity.this);
-        AppsManager appsManager = new AppsManager();
+        appsManager = new AppsManager();
 
 //        appsManager.setArgs(WhitelistActivity.this);
 //        appsManager.initializeApps();
@@ -57,6 +58,8 @@ public class WhitelistActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case android.R.id.home:{ //toolbar의 back키 눌렀을 때 동작
+
+//                appsManager.updateSettings();
                 finish();
                 return true;
             }

@@ -42,9 +42,9 @@ public class UserEventManager extends AppCompatActivity {
 
     public int getRisk(Integer uid){
         if (checkWhitelist(uid)) return 0;
-        if (checkTouchEvent()) return 1;
+        else if (checkTouchEvent()) return 1;
         else if (checkAudioEvent()) return 2;
-
+        else if (checkScreenOn()) return 3;
         return 4;
     }
 

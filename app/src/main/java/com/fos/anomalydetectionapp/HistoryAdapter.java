@@ -2,6 +2,7 @@ package com.fos.anomalydetectionapp;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -67,7 +68,17 @@ public class HistoryAdapter extends BaseAdapter {
         viewName.setTypeface(null, Typeface.BOLD);
         viewUid.setText("UID: " + uid);
         viewUsage.setText("Usage: " + usage + " bytes");
-        viewRisk.setText("Degree of Risk: " + risk);
+        viewRisk.setText("Risk Level: " + risk);
+
+
+        if(risk == 1)
+            viewRisk.setTextColor(Color.parseColor("#2ACAEA"));
+        else if(risk == 2)
+            viewRisk.setTextColor(Color.parseColor("#41A541"));
+        else if(risk == 3)
+            viewRisk.setTextColor(Color.parseColor("#ffa500"));
+        else if(risk == 4)
+            viewRisk.setTextColor(Color.parseColor("#ff6666"));
 
         return view;
     }

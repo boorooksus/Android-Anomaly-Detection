@@ -10,12 +10,15 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.net.NetworkCapabilities;
 import android.os.RemoteException;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,10 +36,57 @@ public class AppsManager extends AppCompatActivity {
 
 
     public void initializeApps(){
+
+        //
+
         PackageManager pm = activity.getPackageManager();
         appDetails = new ArrayList<>();
         appIndex = new HashMap<>();
         HashSet<Integer> appSet = new HashSet<>();
+
+//        SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+//        boolean isInitialized = preferences.getBoolean("isInitialized", false);
+
+//        if (isInitialized){
+//            appDetails = loadAppDetails(activity);
+//
+//            for(int i = 0; i < appDetails.size(); i++){
+//                appIndex.put(appDetails.get(i).getUid(), i);
+//            }
+//
+//
+//        }
+//
+//        else {
+//            NetworkStatsManager networkStatsManager = (NetworkStatsManager) activity.getApplicationContext().
+//                    getSystemService(Context.NETWORK_STATS_SERVICE);
+//
+//            try {
+//                NetworkStats networkStats =
+//                        networkStatsManager.querySummary(NetworkCapabilities.TRANSPORT_WIFI,
+//                                "",
+//                                System.currentTimeMillis() - 3000000,
+//                                System.currentTimeMillis());
+//                do {
+//                    NetworkStats.Bucket bucket = new NetworkStats.Bucket();
+//                    networkStats.getNextBucket(bucket);
+//
+//                    int uid = bucket.getUid();
+//
+//                    if (uid == 0 || uid == 1000) continue;
+//
+//                    appSet.add(uid);
+//
+//                } while (networkStats.hasNextBucket());
+//            } catch (RemoteException e) {
+//                e.printStackTrace();
+//            }
+//
+//            // 작동 여부 공유 변수 true로 변경
+//            SharedPreferences.Editor editor = getPreferences(Context.MODE_PRIVATE).edit();
+//            editor.putBoolean("isRunning", true); // 스위치 상태 변수 세팅
+//            editor.apply(); // 스위치 상태 변수 저장
+//        }
 
         NetworkStatsManager networkStatsManager = (NetworkStatsManager) activity.getApplicationContext().
                 getSystemService(Context.NETWORK_STATS_SERVICE);
@@ -53,14 +103,19 @@ public class AppsManager extends AppCompatActivity {
 
                 int uid = bucket.getUid();
 
-//                if(uid == 0 || uid == 1000) continue;
+                if (uid == 0 || uid == 1000) continue;
 
                 appSet.add(uid);
 
             } while (networkStats.hasNextBucket());
-        } catch(RemoteException e){
+        } catch (RemoteException e) {
             e.printStackTrace();
         }
+
+//        // 작동 여부 공유 변수 true로 변경
+//        SharedPreferences.Editor editor = getPreferences(Context.MODE_PRIVATE).edit();
+//        editor.putBoolean("isRunning", true); // 스위치 상태 변수 세팅
+//        editor.apply(); // 스위치 상태 변수 저장
 
         @SuppressLint("QueryPermissionsNeeded") List<ApplicationInfo> apps = pm.getInstalledApplications(0);
         int i = 0;
@@ -110,38 +165,42 @@ public class AppsManager extends AppCompatActivity {
         return Optional.ofNullable(appIndex.get(uid)).orElse(-1);
     }
 
+    public void updateSettings(){
+        saveAppDetails(activity, appDetails);
+    }
+
     // HashMap 저장
-//    public void saveAppDetails(Context context, ArrayList<AppDetail> hashMapData) {
-//        SharedPreferences mmPref = context.getSharedPreferences("pref", Context.MODE_PRIVATE);
-//        if (mmPref != null) {
-//            JSONObject jsonObject = new JSONObject(hashMapData);
-//            String jsonString = jsonObject.toString();
-//            SharedPreferences.Editor editor = mmPref.edit();
-//            editor.remove("hashMapAppsInfo").apply();
-//            editor.putString("hashMapAppsInfo", jsonString);
-//            editor.apply();
-//        }
-//    }
+    public void saveAppDetails(Context context, ArrayList<AppDetail> appDetails) {
+        SharedPreferences mmPref = context.getSharedPreferences("pref", Context.MODE_PRIVATE);
+        if (mmPref != null) {
+            JSONObject jsonObject = new JSONObject((Map) appDetails);
+            String jsonString = jsonObject.toString();
+            SharedPreferences.Editor editor = mmPref.edit();
+            editor.remove("AppDetails").apply();
+            editor.putString("AppDetails", jsonString);
+            editor.apply();
+        }
+    }
 
     // HashMap 불러오기
-//    public HashMap<String, Boolean> loadAppDetails(Context context) {
-//        HashMap<String, Boolean> outputMap = new HashMap<String, Boolean>();
-//        SharedPreferences mmPref = context.getSharedPreferences("pref", Context.MODE_PRIVATE);
-//        try {
-//            if (mmPref != null) {
-//                String jsonString = mmPref.getString("hashMapAppsInfo", (new JSONObject()).toString());
-//                JSONObject jsonObject = new JSONObject(jsonString);
-//
-//                Iterator<String> keysItr = jsonObject.keys();
-//                while (keysItr.hasNext()) {
-//                    String key = keysItr.next();
-//                    Boolean value = (Boolean) jsonObject.get(key);
-//                    outputMap.put(key, value);
-//                }
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return outputMap;
-//    }
+    public ArrayList<AppDetail> loadAppDetails(Context context) {
+        ArrayList<AppDetail> outputList = new ArrayList<AppDetail>();
+        SharedPreferences mmPref = context.getSharedPreferences("pref", Context.MODE_PRIVATE);
+        try {
+            if (mmPref != null) {
+                String jsonString = mmPref.getString("AppDetails", (new JSONObject()).toString());
+                JSONObject jsonObject = new JSONObject(jsonString);
+
+                Iterator<String> keysItr = jsonObject.keys();
+                while (keysItr.hasNext()) {
+                    String key = keysItr.next();
+                    AppDetail value = (AppDetail) jsonObject.get(key);
+                    outputList.add(value);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return outputList;
+    }
 }

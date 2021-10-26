@@ -9,6 +9,7 @@ import android.app.usage.NetworkStatsManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.NetworkCapabilities;
 import android.net.Uri;
 import android.provider.Settings;
@@ -43,8 +44,8 @@ public class PermissionChecker extends AppCompatActivity {
 
                     // 알림 생성
                     AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                    builder.setMessage("다른 앱 위에 표시 권한은 설정해주세요");
-                    builder.setPositiveButton(
+                    builder.setMessage("다른 앱 위에 표시 권한을 설정해주세요");
+                    builder.setNegativeButton(
                             "확인",
                             new DialogInterface.OnClickListener() {
                                 @Override
@@ -61,6 +62,14 @@ public class PermissionChecker extends AppCompatActivity {
                             });
 
                     AlertDialog alertDialog = builder.create();
+
+                    alertDialog.setOnShowListener( new DialogInterface.OnShowListener() {
+                        @Override
+                        public void onShow(DialogInterface arg0) {
+                            alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#000010"));
+                        }
+                    });
+
                     alertDialog.show();
                 }
             });
@@ -101,7 +110,7 @@ public class PermissionChecker extends AppCompatActivity {
                     // 알림 생성
                     AlertDialog.Builder builder = new AlertDialog.Builder(activity);
                     builder.setMessage("앱의 사용 기록 액세스를 허용해주세요");
-                    builder.setPositiveButton(
+                    builder.setNegativeButton(
                             "확인",
                             new DialogInterface.OnClickListener() {
                                 @Override
@@ -118,6 +127,14 @@ public class PermissionChecker extends AppCompatActivity {
                             });
 
                     AlertDialog alertDialog = builder.create();
+
+                    alertDialog.setOnShowListener( new DialogInterface.OnShowListener() {
+                        @Override
+                        public void onShow(DialogInterface arg0) {
+                            alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#000010"));
+                        }
+                    });
+
                     alertDialog.show();
                 }
             });

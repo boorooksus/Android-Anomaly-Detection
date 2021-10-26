@@ -39,10 +39,10 @@ public class MainActivity extends AppCompatActivity {
 
         AppsManager appsManager = new AppsManager();
 
-        if(permissionChecker.checkAllPermissions()) {
-            appsManager.setArgs(MainActivity.this);
-            appsManager.initializeApps();
-        }
+//        if(permissionChecker.checkAllPermissions()) {
+//            appsManager.setArgs(MainActivity.this);
+//            appsManager.initializeApps();
+//        }
 
         // 뷰 id로 불러오기
         buttonStatus = findViewById(R.id.buttonStatus);
@@ -66,9 +66,12 @@ public class MainActivity extends AppCompatActivity {
         // 리스트뷰, 스위치, 버튼 세팅
         listViewHistory.setAdapter(historyAdapter);
         buttonStatus.setBackgroundColor(Color.parseColor(isRunning ? colorRunning:colorStopped));
-        buttonStatus.setText(isRunning? "Monitoring...":"Start");
+        buttonStatus.setText(isRunning? "Monitoring":"Start");
 
         if(isRunning){
+            appsManager.setArgs(MainActivity.this);
+            appsManager.initializeApps();
+
             startForegroundService(new Intent(MainActivity.this, ServiceManager.class));
         }
 
@@ -78,22 +81,25 @@ public class MainActivity extends AppCompatActivity {
 
                 if (!preferences.getBoolean("isRunning", false)) {
                     // 스위치 켰을 때
+//                      권한 확인
+                    if (permissionChecker.checkAllPermissions()) {
+                        // 권한 있는 경우
 
-                    // 작동 여부 공유 변수 true로 변경
-                    SharedPreferences.Editor editor = getPreferences(Context.MODE_PRIVATE).edit();
-                    editor.putBoolean("isRunning", true); // 스위치 상태 변수 세팅
-                    editor.apply(); // 스위치 상태 변수 저장
+                        appsManager.setArgs(MainActivity.this);
+                        appsManager.initializeApps();
 
-                    // 모니터링 시작
-                    startForegroundService(new Intent(MainActivity.this, ServiceManager.class));
+                        // 작동 여부 공유 변수 true로 변경
+                        SharedPreferences.Editor editor = getPreferences(Context.MODE_PRIVATE).edit();
+                        editor.putBoolean("isRunning", true); // 스위치 상태 변수 세팅
+                        editor.apply(); // 스위치 상태 변수 저장
 
-                    buttonStatus.setBackgroundColor(Color.parseColor(colorRunning));
-                    buttonStatus.setText("MONITORING");
+                        // 모니터링 시작
+                        startForegroundService(new Intent(MainActivity.this, ServiceManager.class));
 
-                    //  권한 확인
-//                    if (permissionChecker.checkAllPermissions()) {
-//                        // 권한 있는 경우
-//                    }
+                        buttonStatus.setBackgroundColor(Color.parseColor(colorRunning));
+                        buttonStatus.setText("MONITORING");
+
+                    }
                 } else {
                     // 스위치 끄면 모니터링 중지
                     buttonStatus.setBackgroundColor(Color.parseColor(colorStopped));
@@ -116,8 +122,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                Intent intent = new Intent(getApplicationContext(), WhitelistActivity.class);
-                startActivity(intent);
+                if(permissionChecker.checkAllPermissions()) {
+
+                    appsManager.setArgs(MainActivity.this);
+                    appsManager.initializeApps();
+
+                    Intent intent = new Intent(getApplicationContext(), WhitelistActivity.class);
+                    startActivity(intent);
+                }
+
 
             }
         });
