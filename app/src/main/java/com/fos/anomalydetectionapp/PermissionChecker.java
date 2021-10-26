@@ -34,6 +34,44 @@ public class PermissionChecker extends AppCompatActivity {
         return checkAccessPermission() && checkOverlayPermission();
     }
 
+    public boolean checkDoNotDisturb(){
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                // 알림 생성
+                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                builder.setMessage("절전 기능 예외 앱을 설정해주세요.");
+                builder.setNegativeButton(
+                        "확인",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+
+                                activity.startActivity(new Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS));
+
+                            }
+                        });
+
+                AlertDialog alertDialog = builder.create();
+
+                alertDialog.setOnShowListener( new DialogInterface.OnShowListener() {
+                    @Override
+                    public void onShow(DialogInterface arg0) {
+                        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#000010"));
+                    }
+                });
+
+                alertDialog.show();
+            }
+        });
+
+        return true;
+
+    }
+
     public boolean checkOverlayPermission() {
         if (!Settings.canDrawOverlays(activity)) {
             // 권한 설정이 안된 경우

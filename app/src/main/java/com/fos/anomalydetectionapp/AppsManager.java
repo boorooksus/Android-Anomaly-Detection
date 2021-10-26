@@ -125,7 +125,7 @@ public class AppsManager extends AppCompatActivity {
             NetworkStats networkStats =
                     networkStatsManager.querySummary(NetworkCapabilities.TRANSPORT_WIFI,
                             "",
-                            System.currentTimeMillis() - 3000000,
+                            0,
                             System.currentTimeMillis());
             do {
                 NetworkStats.Bucket bucket = new NetworkStats.Bucket();

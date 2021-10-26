@@ -59,7 +59,7 @@ public class UserEventManager extends AppCompatActivity {
         // 30초 이내에 터치 기록이 있었는지 확인
 
         int diff = (int)ChronoUnit.SECONDS.between(lastTouchTime, LocalDateTime.now());
-        return diff < 20;
+        return diff >= 0 && diff < 20;
     }
 
     public boolean checkAudioEvent(){
