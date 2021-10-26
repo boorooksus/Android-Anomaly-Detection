@@ -62,7 +62,11 @@ public class AppsManager extends AppCompatActivity {
                 NetworkStats.Bucket bucket = new NetworkStats.Bucket();
                 networkStats.getNextBucket(bucket);
 
-                appSet.add(bucket.getUid());
+                int uid = bucket.getUid();
+
+                if(uid == 0 || uid == 1000) continue;
+
+                appSet.add(uid);
 
             } while (networkStats.hasNextBucket());
         } catch(RemoteException e){
@@ -83,7 +87,7 @@ public class AppsManager extends AppCompatActivity {
             boolean isSafe = false;
 
             if (processName.contains("com.android") || processName.contains("com.google")
-                    || processName.contains("com.lge"))
+                    || processName.contains("com.lge") || processName.contains("android.process"))
                 isSafe = true;
 
             AppDetail appDetail = new AppDetail(i, appName, processName, uid, isSafe);
