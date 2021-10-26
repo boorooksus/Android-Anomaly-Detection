@@ -40,16 +40,16 @@ public class UserEventManager extends AppCompatActivity {
         lastTouchTime = LocalDateTime.now();
     }
 
-    public int getRisk(String processName){
-        if (checkWhitelist(processName)) return 0;
+    public int getRisk(Integer uid){
+        if (checkWhitelist(uid)) return 0;
         if (checkTouchEvent()) return 1;
         else if (checkAudioEvent()) return 2;
 
         return 4;
     }
 
-    public boolean checkWhitelist(String processName){
-        int index = appsManager.getIndex(processName);
+    public boolean checkWhitelist(Integer uid){
+        int index = appsManager.getIndex(uid);
         if (index == -1) return false;
         return appsManager.getAppDetail(index).getIsInWhitelist();
     }

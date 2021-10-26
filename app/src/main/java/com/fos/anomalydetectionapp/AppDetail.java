@@ -30,6 +30,10 @@ public class AppDetail {
         return appProcessName;
     }
 
+    public int getUid() {
+        return uid;
+    }
+
     public boolean getIsInWhitelist() {
         return isInWhitelist;
     }

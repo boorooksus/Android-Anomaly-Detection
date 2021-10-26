@@ -34,7 +34,7 @@ public class AppsManager extends AppCompatActivity {
 
 
     private static ArrayList<AppDetail> appDetails;
-    private static HashMap<String, Integer> appIndex;
+    private static HashMap<Integer, Integer> appIndex;
 
 //    public AppsManager(Activity activity) {
 //    public AppsManager() {
@@ -88,7 +88,7 @@ public class AppsManager extends AppCompatActivity {
 
             AppDetail appDetail = new AppDetail(i, appName, processName, uid, isSafe);
             appDetails.add(appDetail);
-            appIndex.put(processName, i);
+            appIndex.put(uid, i);
             i++;
         }
     }
@@ -115,8 +115,8 @@ public class AppsManager extends AppCompatActivity {
         return appDetails.get(position);
     }
 
-    public int getIndex(String processName){
-        return Optional.ofNullable(appIndex.get(processName)).orElse(-1);
+    public int getIndex(Integer uid){
+        return Optional.ofNullable(appIndex.get(uid)).orElse(-1);
     }
 
 

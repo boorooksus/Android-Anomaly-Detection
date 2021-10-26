@@ -25,7 +25,7 @@ import java.util.TimerTask;
 // 트래픽 모니터링 클래스
 public class TrafficMonitor extends AppCompatActivity {
 
-    private static Map<String, String> appNames;  // 앱의 process name과 이름 매핑
+//    private static Map<String, String> appNames;  // 앱의 process name과 이름 매핑
     private static Map<String, Long> lastUsage;  // 앱의 마지막 트래픽 저장
     private static boolean isInitialized;  // lastUsage 리스트 초기화 여부 저장
     TrafficHistory trafficHistory;  // 트래픽 히스토리 내역 리스트
@@ -44,7 +44,7 @@ public class TrafficMonitor extends AppCompatActivity {
     public TrafficMonitor(Activity activity, HistoryAdapter historyAdapter, TrafficHistory trafficHistory) {
 
         // 초기화
-        appNames = new HashMap<>();
+//        appNames = new HashMap<>();
         lastUsage = new HashMap<>();
         isInitialized = false;
         this.trafficHistory = trafficHistory;
@@ -65,32 +65,32 @@ public class TrafficMonitor extends AppCompatActivity {
     }
 
     // 디바이스에 설치된 어플들 이름 저장 및 현재까지 사용한 트래픽 초기화
-    public void initializeTraffic(){
-
-//         쓰레드 생성
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                // 디바이스에 설치된 앱들의 app process name, 앱 이름 매핑해서 리스트에 저장
-                @SuppressLint("QueryPermissionsNeeded") List<ApplicationInfo> apps = pm.getInstalledApplications(0);
-                for (ApplicationInfo app : apps) {
-                    String appName = app.loadLabel(pm).toString();
-                    String processName = app.processName;
-
-                    appNames.put(processName, appName);
-                }
-
-            }
-        }).start();
-
-    }
+//    public void initializeTraffic(){
+//
+//////         쓰레드 생성
+////        new Thread(new Runnable() {
+////            @Override
+////            public void run() {
+////                // 디바이스에 설치된 앱들의 app process name, 앱 이름 매핑해서 리스트에 저장
+////                @SuppressLint("QueryPermissionsNeeded") List<ApplicationInfo> apps = pm.getInstalledApplications(0);
+////                for (ApplicationInfo app : apps) {
+////                    String appName = app.loadLabel(pm).toString();
+////                    String processName = app.processName;
+////
+////                    appNames.put(processName, appName);
+////                }
+////
+////            }
+////        }).start();
+//
+//    }
 
     // 앱별 네트워크 사용량을 구하고 업데이트 하는 함수
     public void detectTraffic(){
 
-        if(!isInitialized){
-            initializeTraffic();
-        }
+//        if(!isInitialized){
+//            initializeTraffic();
+//        }
 
         try {
             Log.v("TrafficMonitor", "Checking - " + LocalDateTime.now().toString());
@@ -107,22 +107,28 @@ public class TrafficMonitor extends AppCompatActivity {
                 networkStats.getNextBucket(bucket);
 
                 final int uid = bucket.getUid();  // 앱 uid
-                final String processName = pm.getNameForUid(uid);
-
+//                final String processName = pm.getNameForUid(uid);
                 // 앱 정보 얻기
-                final String appLabel = Optional.ofNullable(appNames.get(processName)).orElse("untitled");  // 앱 레이블(기본 이름)
+                int index = appsManager.getIndex(uid);
+                final String appLabel = (index != -1 ? appsManager.getAppDetail(index).getAppLabel() : "untitled");
+                final String processName = (index != -1 ? appsManager.getAppDetail(index).getAppProcessName() : "untitled");
                 final long usage = bucket.getTxBytes();  // 현재까지 보낸 트래픽 총량
                 final long diff = usage - Optional.ofNullable(lastUsage.get(processName)).orElse((long) 0);  // 증가한 트래픽 양
-                final int risk = userEventManager.getRisk(processName);
+
+
+
+//                final String appLabel = Optional.ofNullable(appNames.get(processName)).orElse("untitled");  // 앱 레이블(기본 이름)
+//                final long diff = usage - Optional.ofNullable(lastUsage.get(processName)).orElse((long) 0);  // 증가한 트래픽 양
+                final int risk = userEventManager.getRisk(uid);
 
                 if(diff <= 0){
-                    // 앱 네트워크 사용량에 변동이 없는 경우 continue
                     continue;
                 }
 
+
                 // 현재 함수가 lastUsage 컬렉션 초기화를 위해 실행중인 경우에는 히스토리 목록에 넣지 않는다
                 if(isInitialized){
-                    // 초기화가 이미 이루어진 경우 히스토리 목록 업데이트
+//                         초기화가 이미 이루어진 경우 히스토리 목록 업데이트
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -138,22 +144,11 @@ public class TrafficMonitor extends AppCompatActivity {
 
                             log += "," + uid + "," + usage + "," + risk + "," + appLabel + "," + processName;
 
-                            Log.v("TrafficMonitor1", log);
-
-                            if(userEventManager.checkTouchEvent())
-                                Log.v("TrafficMonitor2", "Touch Event Detected");
-                            else
-                                Log.v("TrafficMonitor2", "No Touch Event!!!!");
-
-                            if(userEventManager.checkAudioEvent())
-                                Log.v("TrafficMonitor3", "Audio Playing Detected");
-                            else
-                                Log.v("TrafficMonitor3", "No Audio Playing!!!!");
-
-                            if(userEventManager.checkScreenOn())
-                                Log.v("TrafficMonitor4", "Screen On");
-                            else
-                                Log.v("TrafficMonitor4", "Screen Off!!!!");
+                            Log.v("TrafficMonitor", log);
+                            Log.v("TrafficMonitor", "whitelist: " + userEventManager.checkWhitelist(uid)
+                             + ", touch event: " + userEventManager.checkTouchEvent()
+                                    + ", audio on: " + userEventManager.checkAudioEvent()
+                            + ", screen on: " + userEventManager.checkScreenOn());
 
                         }
                     });

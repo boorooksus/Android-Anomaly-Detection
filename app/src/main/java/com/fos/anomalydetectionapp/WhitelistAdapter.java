@@ -2,6 +2,7 @@ package com.fos.anomalydetectionapp;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.graphics.Typeface;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -54,14 +55,18 @@ public class WhitelistAdapter extends BaseAdapter {
 
         String appName = Optional.ofNullable(appDetail.getAppLabel()).orElse("untitled");
         String appProcessName = Optional.ofNullable(appDetail.getAppProcessName()).orElse("untitled");
+        int uid = appDetail.getUid();
         isInWhitelist = appDetail.getIsInWhitelist();
 
         TextView viewName = view.findViewById(R.id.appName);
         TextView viewProcessName = view.findViewById(R.id.appProcessName);
+        TextView viewUid = view.findViewById(R.id.appUid);
         ImageButton button = view.findViewById(R.id.buttonAddWhitelist);
 
         viewName.setText(appName);
+        viewName.setTypeface(null, Typeface.BOLD);
         viewProcessName.setText(appProcessName);
+        viewUid.setText("uid: " + uid);
 
         if(isInWhitelist)
             button.setImageResource(R.drawable.check);

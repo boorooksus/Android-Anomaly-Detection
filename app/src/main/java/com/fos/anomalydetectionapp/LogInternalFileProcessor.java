@@ -63,7 +63,8 @@ public class LogInternalFileProcessor implements LogFileProcessor{
 
             String log = time.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
             log += "," + uid + "," + usage + "," + risk + "," + name + "," + processName;
-            Log.v("LogInternalFileProcessor", log);
+
+//            Log.v("LogInternalFileProcessor", log);
 
             bw.write(log);
             bw.newLine();

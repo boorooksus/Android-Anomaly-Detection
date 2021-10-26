@@ -33,29 +33,31 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         PermissionChecker permissionChecker = new PermissionChecker(MainActivity.this);
-        if(permissionChecker.checkAllPermissions()){
-            ServiceManager serviceManager = new ServiceManager();
-            serviceManager.setArgs(MainActivity.this);
 
-            AppsManager appsManager = new AppsManager();
+        ServiceManager serviceManager = new ServiceManager();
+        serviceManager.setArgs(MainActivity.this);
 
+        AppsManager appsManager = new AppsManager();
+
+        if(permissionChecker.checkAllPermissions()) {
             appsManager.setArgs(MainActivity.this);
             appsManager.initializeApps();
-
-            // 뷰 id로 불러오기
-            buttonStatus = findViewById(R.id.buttonStatus);
-            buttonWhitelist = findViewById(R.id.buttonWhiteList);
-            listViewHistory = findViewById(R.id.listViewHistory);
-            historyAdapter = serviceManager.getHistoryAdapter();
-
-            // actionbar setting
-            toolbar = findViewById(R.id.toolbar);
-            setSupportActionBar(toolbar);
-            actionBar = getSupportActionBar();
-            assert actionBar != null;
-            actionBar.setDisplayShowCustomEnabled(true);
-            actionBar.setDisplayShowTitleEnabled(false);
         }
+
+        // 뷰 id로 불러오기
+        buttonStatus = findViewById(R.id.buttonStatus);
+        buttonWhitelist = findViewById(R.id.buttonWhiteList);
+        listViewHistory = findViewById(R.id.listViewHistory);
+        historyAdapter = serviceManager.getHistoryAdapter();
+
+        // actionbar setting
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        actionBar = getSupportActionBar();
+        assert actionBar != null;
+        actionBar.setDisplayShowCustomEnabled(true);
+        actionBar.setDisplayShowTitleEnabled(false);
+
 
         // 마지막 스위치 상태 가져오기
         SharedPreferences preferences = getPreferences(MODE_PRIVATE);
@@ -72,8 +74,9 @@ public class MainActivity extends AppCompatActivity {
 
         buttonStatus.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                if(!preferences.getBoolean("isRunning", false)){
+            public void onClick(View view){
+
+                if (!preferences.getBoolean("isRunning", false)) {
                     // 스위치 켰을 때
 
                     // 작동 여부 공유 변수 true로 변경
@@ -85,14 +88,13 @@ public class MainActivity extends AppCompatActivity {
                     startForegroundService(new Intent(MainActivity.this, ServiceManager.class));
 
                     buttonStatus.setBackgroundColor(Color.parseColor(colorRunning));
-                    buttonStatus.setText("Monitoring...");
+                    buttonStatus.setText("MONITORING");
 
-                        //  권한 확인
+                    //  권한 확인
 //                    if (permissionChecker.checkAllPermissions()) {
 //                        // 권한 있는 경우
 //                    }
-                }
-                else{
+                } else {
                     // 스위치 끄면 모니터링 중지
                     buttonStatus.setBackgroundColor(Color.parseColor(colorStopped));
                     buttonStatus.setText("Start");
@@ -106,14 +108,17 @@ public class MainActivity extends AppCompatActivity {
 
 
                 }
+
             }
         });
 
         buttonWhitelist.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 Intent intent = new Intent(getApplicationContext(), WhitelistActivity.class);
                 startActivity(intent);
+
             }
         });
     }
