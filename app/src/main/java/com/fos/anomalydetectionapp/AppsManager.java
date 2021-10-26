@@ -44,10 +44,10 @@ public class AppsManager extends AppCompatActivity {
         appIndex = new HashMap<>();
         HashSet<Integer> appSet = new HashSet<>();
 
-//        SharedPreferences preferences = getPreferences(MODE_PRIVATE);
-//        boolean isInitialized = preferences.getBoolean("isInitialized", false);
-
-//        if (isInitialized){
+//        SharedPreferences preferences = activity.getPreferences(MODE_PRIVATE);
+////        boolean isInitialized = preferences.getBoolean("isInitialized", false);
+//
+//        if (preferences.getBoolean("isInitialized", false)){
 //            appDetails = loadAppDetails(activity);
 //
 //            for(int i = 0; i < appDetails.size(); i++){
@@ -56,7 +56,6 @@ public class AppsManager extends AppCompatActivity {
 //
 //
 //        }
-//
 //        else {
 //            NetworkStatsManager networkStatsManager = (NetworkStatsManager) activity.getApplicationContext().
 //                    getSystemService(Context.NETWORK_STATS_SERVICE);
@@ -82,11 +81,34 @@ public class AppsManager extends AppCompatActivity {
 //                e.printStackTrace();
 //            }
 //
+//            @SuppressLint("QueryPermissionsNeeded") List<ApplicationInfo> apps = pm.getInstalledApplications(0);
+//            int i = 0;
+//            for (ApplicationInfo app : apps) {
+//                String appName = app.loadLabel(pm).toString();
+//                String processName = app.processName;
+//                int uid = app.uid;
+//
+//                if (!appSet.contains(uid)) continue;
+//
+//                boolean isSafe = false;
+//
+//                if (processName.contains("com.android") || processName.contains("com.google")
+//                        || processName.contains("com.lge") || processName.contains("android.process"))
+//                    isSafe = true;
+//
+//                AppDetail appDetail = new AppDetail(i, appName, processName, uid, isSafe);
+//                appDetails.add(appDetail);
+//                appIndex.put(uid, i);
+//                i++;
+//            }
+//
 //            // 작동 여부 공유 변수 true로 변경
-//            SharedPreferences.Editor editor = getPreferences(Context.MODE_PRIVATE).edit();
-//            editor.putBoolean("isRunning", true); // 스위치 상태 변수 세팅
+//            SharedPreferences.Editor editor = activity.getPreferences(Context.MODE_PRIVATE).edit();
+//            editor.putBoolean("isInitialized", true); // 스위치 상태 변수 세팅
 //            editor.apply(); // 스위치 상태 변수 저장
 //        }
+
+
 
         NetworkStatsManager networkStatsManager = (NetworkStatsManager) activity.getApplicationContext().
                 getSystemService(Context.NETWORK_STATS_SERVICE);
@@ -112,10 +134,6 @@ public class AppsManager extends AppCompatActivity {
             e.printStackTrace();
         }
 
-//        // 작동 여부 공유 변수 true로 변경
-//        SharedPreferences.Editor editor = getPreferences(Context.MODE_PRIVATE).edit();
-//        editor.putBoolean("isRunning", true); // 스위치 상태 변수 세팅
-//        editor.apply(); // 스위치 상태 변수 저장
 
         @SuppressLint("QueryPermissionsNeeded") List<ApplicationInfo> apps = pm.getInstalledApplications(0);
         int i = 0;
@@ -137,6 +155,7 @@ public class AppsManager extends AppCompatActivity {
             appIndex.put(uid, i);
             i++;
         }
+
     }
 
 

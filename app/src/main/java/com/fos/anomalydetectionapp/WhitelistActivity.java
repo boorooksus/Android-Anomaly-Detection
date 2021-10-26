@@ -60,6 +60,7 @@ public class WhitelistActivity extends AppCompatActivity {
             case android.R.id.home:{ //toolbar의 back키 눌렀을 때 동작
 
 //                appsManager.updateSettings();
+
                 finish();
                 return true;
             }
