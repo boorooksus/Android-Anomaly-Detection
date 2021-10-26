@@ -45,9 +45,11 @@ public class AppsManager extends AppCompatActivity {
         HashSet<Integer> appSet = new HashSet<>();
 
 //        SharedPreferences preferences = activity.getPreferences(MODE_PRIVATE);
-////        boolean isInitialized = preferences.getBoolean("isInitialized", false);
+//        boolean isWhitelistExist = preferences.getBoolean("isWhitelistExist", false);
 //
-//        if (preferences.getBoolean("isInitialized", false)){
+//        Log.v("=====================isWhitelistExist? ", isWhitelistExist + "");
+//
+//        if (preferences.getBoolean("isWhitelistExist", false)){
 //            appDetails = loadAppDetails(activity);
 //
 //            for(int i = 0; i < appDetails.size(); i++){
@@ -104,9 +106,15 @@ public class AppsManager extends AppCompatActivity {
 //
 //            // 작동 여부 공유 변수 true로 변경
 //            SharedPreferences.Editor editor = activity.getPreferences(Context.MODE_PRIVATE).edit();
-//            editor.putBoolean("isInitialized", true); // 스위치 상태 변수 세팅
+//            editor.putBoolean("isWhitelistExist", true); // 스위치 상태 변수 세팅
 //            editor.apply(); // 스위치 상태 변수 저장
 //        }
+
+// ===============================================
+        SharedPreferences.Editor editor = activity.getPreferences(Context.MODE_PRIVATE).edit();
+            editor.putBoolean("isWhitelistExist", false); // 스위치 상태 변수 세팅
+            editor.apply(); // 스위치 상태 변수 저장
+        // ===============================================
 
 
 
