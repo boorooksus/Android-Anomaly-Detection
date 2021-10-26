@@ -115,15 +115,14 @@ public class TrafficMonitor extends AppCompatActivity {
                 final long usage = bucket.getTxBytes();  // 현재까지 보낸 트래픽 총량
                 final long diff = usage - Optional.ofNullable(lastUsage.get(processName)).orElse((long) 0);  // 증가한 트래픽 양
 
+//                if(uid == 0 || uid == 1000) continue;
 
+                if(diff <= 0) continue;
 
 //                final String appLabel = Optional.ofNullable(appNames.get(processName)).orElse("untitled");  // 앱 레이블(기본 이름)
 //                final long diff = usage - Optional.ofNullable(lastUsage.get(processName)).orElse((long) 0);  // 증가한 트래픽 양
                 final int risk = userEventManager.getRisk(uid);
 
-                if(diff <= 0){
-                    continue;
-                }
 
 
                 // 현재 함수가 lastUsage 컬렉션 초기화를 위해 실행중인 경우에는 히스토리 목록에 넣지 않는다

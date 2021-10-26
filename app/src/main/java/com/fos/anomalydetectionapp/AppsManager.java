@@ -28,20 +28,9 @@ import java.util.Vector;
 public class AppsManager extends AppCompatActivity {
 
     Activity activity;
-//    WhitelistAdapter whitelistAdapter;
-//    private static HashMap<String, Boolean> appSafeties;
-//    private static Object[] appNames;
-
-
     private static ArrayList<AppDetail> appDetails;
     private static HashMap<Integer, Integer> appIndex;
 
-//    public AppsManager(Activity activity) {
-//    public AppsManager() {
-////        this.activity = activity;
-//
-//
-//    }
 
     public void initializeApps(){
         PackageManager pm = activity.getPackageManager();
@@ -64,7 +53,7 @@ public class AppsManager extends AppCompatActivity {
 
                 int uid = bucket.getUid();
 
-                if(uid == 0 || uid == 1000) continue;
+//                if(uid == 0 || uid == 1000) continue;
 
                 appSet.add(uid);
 
@@ -80,9 +69,7 @@ public class AppsManager extends AppCompatActivity {
             String processName = app.processName;
             int uid = app.uid;
 
-            if (!appSet.contains(uid)) {
-                continue;
-            }
+            if (!appSet.contains(uid)) continue;
 
             boolean isSafe = false;
 
@@ -122,33 +109,6 @@ public class AppsManager extends AppCompatActivity {
     public int getIndex(Integer uid){
         return Optional.ofNullable(appIndex.get(uid)).orElse(-1);
     }
-
-
-//    public int getAppsCount(){
-//        return appSafeties.size();
-//    }
-//
-//    public String getAppName(int position){
-//        return (String) appNames[position];
-//    }
-//
-//    public Boolean getAppSafe(int position){
-//        return appSafeties.get(getAppName(position));
-//    }
-//
-//    public HashMap<String, Boolean> getAppSafeties() {
-//        return appSafeties;
-//    }
-
-//    public WhitelistAdapter getWhitelistAdapter(){
-//
-//        return whitelistAdapter;
-//    }
-
-//    public void updateAppSafety(String appName, boolean isSafe){
-//        appSafeties.put(appName, isSafe);
-//        saveAppsInfo(activity, appSafeties);
-//    }
 
     // HashMap 저장
 //    public void saveAppDetails(Context context, ArrayList<AppDetail> hashMapData) {
