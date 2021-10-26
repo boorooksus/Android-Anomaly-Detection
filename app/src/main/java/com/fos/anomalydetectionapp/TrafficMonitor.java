@@ -131,16 +131,6 @@ public class TrafficMonitor extends AppCompatActivity {
                             TrafficDetail trafficDetail = new TrafficDetail(LocalDateTime.now(), appLabel, processName, uid, usage, risk);
                             trafficHistory.addTraffic(trafficDetail);
 
-//                            activity.runOnUiThread(new Runnable(){
-//                                @Override
-//                                public void run() {
-//                                    // 어댑터 업데이트
-////                                    adapterHistory.notifyDataSetChanged();
-//                                    listViewHistory.setAdapter(historyAdapter);
-//                                }
-//                            });
-
-
                             // 로그 파일에 저장
                             logFileProcessor.writeLog(activity, trafficDetail);
 

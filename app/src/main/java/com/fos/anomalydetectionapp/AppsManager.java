@@ -2,10 +2,15 @@ package com.fos.anomalydetectionapp;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.usage.NetworkStats;
+import android.app.usage.NetworkStatsManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.net.NetworkCapabilities;
+import android.os.RemoteException;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -13,6 +18,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -41,19 +47,46 @@ public class AppsManager extends AppCompatActivity {
         PackageManager pm = activity.getPackageManager();
         appDetails = new ArrayList<>();
         appIndex = new HashMap<>();
+        HashSet<Integer> appSet = new HashSet<>();
+
+        NetworkStatsManager networkStatsManager = (NetworkStatsManager) activity.getApplicationContext().
+                getSystemService(Context.NETWORK_STATS_SERVICE);
+
+        try {
+            NetworkStats networkStats =
+                    networkStatsManager.querySummary(NetworkCapabilities.TRANSPORT_WIFI,
+                            "",
+                            System.currentTimeMillis() - 3000000,
+                            System.currentTimeMillis());
+            do {
+                NetworkStats.Bucket bucket = new NetworkStats.Bucket();
+                networkStats.getNextBucket(bucket);
+
+                appSet.add(bucket.getUid());
+
+            } while (networkStats.hasNextBucket());
+        } catch(RemoteException e){
+            e.printStackTrace();
+        }
 
         @SuppressLint("QueryPermissionsNeeded") List<ApplicationInfo> apps = pm.getInstalledApplications(0);
         int i = 0;
         for (ApplicationInfo app : apps) {
             String appName = app.loadLabel(pm).toString();
             String processName = app.processName;
+            int uid = app.uid;
+
+            if (!appSet.contains(uid)) {
+                continue;
+            }
+
             boolean isSafe = false;
 
             if (processName.contains("com.android") || processName.contains("com.google")
                     || processName.contains("com.lge"))
                 isSafe = true;
 
-            AppDetail appDetail = new AppDetail(i, appName, processName, isSafe);
+            AppDetail appDetail = new AppDetail(i, appName, processName, uid, isSafe);
             appDetails.add(appDetail);
             appIndex.put(processName, i);
             i++;

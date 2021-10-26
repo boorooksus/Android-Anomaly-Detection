@@ -7,11 +7,13 @@ public class AppDetail {
     private int index;
     private String appLabel;  // 앱 레이블(기본 이름)
     private String appProcessName;  // 앱 이름(상세 이름)
+    private int uid;
     private boolean isInWhitelist;
 
-    public AppDetail(int index, String appLabel, String appProcessName, boolean isInWhitelist) {
+    public AppDetail(int index, String appLabel, String appProcessName, int uid, boolean isInWhitelist) {
         this.index = index;
         this.appLabel = appLabel;
+        this.uid = uid;
         this.appProcessName = appProcessName;
         this.isInWhitelist = isInWhitelist;
     }
