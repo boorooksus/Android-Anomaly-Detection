@@ -39,10 +39,10 @@ public class MainActivity extends AppCompatActivity {
 
         AppsManager appsManager = new AppsManager();
 
-//        if(permissionChecker.checkAllPermissions()) {
-//            appsManager.setArgs(MainActivity.this);
-//            appsManager.initializeApps();
-//        }
+        if(permissionChecker.checkAllPermissions()) {
+            appsManager.setArgs(MainActivity.this);
+            appsManager.initializeApps();
+        }
 
         // 뷰 id로 불러오기
         buttonStatus = findViewById(R.id.buttonStatus);
@@ -123,9 +123,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 if(permissionChecker.checkAllPermissions()) {
-
-                    appsManager.setArgs(MainActivity.this);
-                    appsManager.initializeApps();
 
                     Intent intent = new Intent(getApplicationContext(), WhitelistActivity.class);
                     startActivity(intent);

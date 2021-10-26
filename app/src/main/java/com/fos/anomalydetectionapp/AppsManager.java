@@ -37,85 +37,10 @@ public class AppsManager extends AppCompatActivity {
 
     public void initializeApps(){
 
-        //
-
         PackageManager pm = activity.getPackageManager();
         appDetails = new ArrayList<>();
         appIndex = new HashMap<>();
         HashSet<Integer> appSet = new HashSet<>();
-
-//        SharedPreferences preferences = activity.getPreferences(MODE_PRIVATE);
-//        boolean isWhitelistExist = preferences.getBoolean("isWhitelistExist", false);
-//
-//        Log.v("=====================isWhitelistExist? ", isWhitelistExist + "");
-//
-//        if (preferences.getBoolean("isWhitelistExist", false)){
-//            appDetails = loadAppDetails(activity);
-//
-//            for(int i = 0; i < appDetails.size(); i++){
-//                appIndex.put(appDetails.get(i).getUid(), i);
-//            }
-//
-//
-//        }
-//        else {
-//            NetworkStatsManager networkStatsManager = (NetworkStatsManager) activity.getApplicationContext().
-//                    getSystemService(Context.NETWORK_STATS_SERVICE);
-//
-//            try {
-//                NetworkStats networkStats =
-//                        networkStatsManager.querySummary(NetworkCapabilities.TRANSPORT_WIFI,
-//                                "",
-//                                System.currentTimeMillis() - 3000000,
-//                                System.currentTimeMillis());
-//                do {
-//                    NetworkStats.Bucket bucket = new NetworkStats.Bucket();
-//                    networkStats.getNextBucket(bucket);
-//
-//                    int uid = bucket.getUid();
-//
-//                    if (uid == 0 || uid == 1000) continue;
-//
-//                    appSet.add(uid);
-//
-//                } while (networkStats.hasNextBucket());
-//            } catch (RemoteException e) {
-//                e.printStackTrace();
-//            }
-//
-//            @SuppressLint("QueryPermissionsNeeded") List<ApplicationInfo> apps = pm.getInstalledApplications(0);
-//            int i = 0;
-//            for (ApplicationInfo app : apps) {
-//                String appName = app.loadLabel(pm).toString();
-//                String processName = app.processName;
-//                int uid = app.uid;
-//
-//                if (!appSet.contains(uid)) continue;
-//
-//                boolean isSafe = false;
-//
-//                if (processName.contains("com.android") || processName.contains("com.google")
-//                        || processName.contains("com.lge") || processName.contains("android.process"))
-//                    isSafe = true;
-//
-//                AppDetail appDetail = new AppDetail(i, appName, processName, uid, isSafe);
-//                appDetails.add(appDetail);
-//                appIndex.put(uid, i);
-//                i++;
-//            }
-//
-//            // 작동 여부 공유 변수 true로 변경
-//            SharedPreferences.Editor editor = activity.getPreferences(Context.MODE_PRIVATE).edit();
-//            editor.putBoolean("isWhitelistExist", true); // 스위치 상태 변수 세팅
-//            editor.apply(); // 스위치 상태 변수 저장
-//        }
-
-// ===============================================
-        SharedPreferences.Editor editor = activity.getPreferences(Context.MODE_PRIVATE).edit();
-            editor.putBoolean("isWhitelistExist", false); // 스위치 상태 변수 세팅
-            editor.apply(); // 스위치 상태 변수 저장
-        // ===============================================
-
 
 
         NetworkStatsManager networkStatsManager = (NetworkStatsManager) activity.getApplicationContext().
@@ -175,6 +100,7 @@ public class AppsManager extends AppCompatActivity {
         AppDetail temp = appDetails.get(position);
         temp.setInWhitelist(isSafe);
         appDetails.set(position, temp);
+
     }
 
     // 저장된 히스토리 개수 리턴
@@ -192,42 +118,42 @@ public class AppsManager extends AppCompatActivity {
         return Optional.ofNullable(appIndex.get(uid)).orElse(-1);
     }
 
-    public void updateSettings(){
-        saveAppDetails(activity, appDetails);
-    }
-
-    // HashMap 저장
-    public void saveAppDetails(Context context, ArrayList<AppDetail> appDetails) {
-        SharedPreferences mmPref = context.getSharedPreferences("pref", Context.MODE_PRIVATE);
-        if (mmPref != null) {
-            JSONObject jsonObject = new JSONObject((Map) appDetails);
-            String jsonString = jsonObject.toString();
-            SharedPreferences.Editor editor = mmPref.edit();
-            editor.remove("AppDetails").apply();
-            editor.putString("AppDetails", jsonString);
-            editor.apply();
-        }
-    }
-
-    // HashMap 불러오기
-    public ArrayList<AppDetail> loadAppDetails(Context context) {
-        ArrayList<AppDetail> outputList = new ArrayList<AppDetail>();
-        SharedPreferences mmPref = context.getSharedPreferences("pref", Context.MODE_PRIVATE);
-        try {
-            if (mmPref != null) {
-                String jsonString = mmPref.getString("AppDetails", (new JSONObject()).toString());
-                JSONObject jsonObject = new JSONObject(jsonString);
-
-                Iterator<String> keysItr = jsonObject.keys();
-                while (keysItr.hasNext()) {
-                    String key = keysItr.next();
-                    AppDetail value = (AppDetail) jsonObject.get(key);
-                    outputList.add(value);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return outputList;
-    }
+//    public void updateSettings(){
+//        saveAppDetails(activity, appDetails);
+//    }
+//
+//    // HashMap 저장
+//    public void saveAppDetails(Context context, ArrayList<AppDetail> appDetails) {
+//        SharedPreferences mmPref = context.getSharedPreferences("pref", Context.MODE_PRIVATE);
+//        if (mmPref != null) {
+//            JSONObject jsonObject = new JSONObject((Map) appDetails);
+//            String jsonString = jsonObject.toString();
+//            SharedPreferences.Editor editor = mmPref.edit();
+//            editor.remove("AppDetails").apply();
+//            editor.putString("AppDetails", jsonString);
+//            editor.apply();
+//        }
+//    }
+//
+//    // HashMap 불러오기
+//    public ArrayList<AppDetail> loadAppDetails(Context context) {
+//        ArrayList<AppDetail> outputList = new ArrayList<AppDetail>();
+//        SharedPreferences mmPref = context.getSharedPreferences("pref", Context.MODE_PRIVATE);
+//        try {
+//            if (mmPref != null) {
+//                String jsonString = mmPref.getString("AppDetails", (new JSONObject()).toString());
+//                JSONObject jsonObject = new JSONObject(jsonString);
+//
+//                Iterator<String> keysItr = jsonObject.keys();
+//                while (keysItr.hasNext()) {
+//                    String key = keysItr.next();
+//                    AppDetail value = (AppDetail) jsonObject.get(key);
+//                    outputList.add(value);
+//                }
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return outputList;
+//    }
 }
