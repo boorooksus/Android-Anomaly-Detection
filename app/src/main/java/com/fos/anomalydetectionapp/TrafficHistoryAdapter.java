@@ -13,15 +13,15 @@ import android.widget.TextView;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-// 네트워크 히스토리 리스트뷰 어댑터
-public class HistoryAdapter extends BaseAdapter {
+// 트래픽 로그 리스트뷰 어댑터
+public class TrafficHistoryAdapter extends BaseAdapter {
 
     TrafficHistory trafficHistory;  // 트래픽 히스토리 목록 인스턴스
     LayoutInflater layoutInflater;
     Activity activity;  // 메인 액티비티 컨텍스트
 
     // Constructor
-    public HistoryAdapter(Activity activity, TrafficHistory trafficHistory) {
+    public TrafficHistoryAdapter(Activity activity, TrafficHistory trafficHistory) {
         this.activity = activity;
         this.trafficHistory = trafficHistory;
         layoutInflater = LayoutInflater.from(activity);

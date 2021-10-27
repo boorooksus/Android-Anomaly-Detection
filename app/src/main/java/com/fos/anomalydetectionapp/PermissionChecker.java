@@ -1,7 +1,5 @@
 package com.fos.anomalydetectionapp;
 
-import static android.view.WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -15,35 +13,33 @@ import android.net.NetworkCapabilities;
 import android.net.Uri;
 import android.os.PowerManager;
 import android.provider.Settings;
-import android.util.Log;
-
 import androidx.appcompat.app.AppCompatActivity;
 
+// 앱의 권한 체크 클래스
 public class PermissionChecker extends AppCompatActivity {
 
     @SuppressLint("StaticFieldLeak")
     private static Activity activity;
-    private final NetworkStatsManager networkStatsManager; // 어플 별 네트워크 사용 내역 얻을 때 사용
 
-
+    // Constructor
     public PermissionChecker(Activity activity) {
         PermissionChecker.activity = activity;
-
-        networkStatsManager =
-                (NetworkStatsManager) activity.getApplicationContext().
-                        getSystemService(Context.NETWORK_STATS_SERVICE);;
     }
 
+    // 앱에 필요한 모든 권한 체크 함수
     public boolean checkAllPermissions(){
         return checkIgnoreBatteryOptimization() && checkAccessPermission() && checkOverlayPermission();
     }
 
+    // 절전 기능 제외 앱 설정 체크 함수
     @SuppressLint("BatteryLife")
     public boolean checkIgnoreBatteryOptimization(){
 
         PowerManager powerManager = (PowerManager) activity.getSystemService(Context.POWER_SERVICE);
+
         if (!powerManager.isIgnoringBatteryOptimizations(activity.getPackageName())) {
-            // 화이트 리스트 등록 안됨.
+            // 절전 기능 제외 앱이 아닌 경우
+
             Intent intent = new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
             openSettingPage("절전 기능 예외 앱을 설정해주세요.", intent);
 
@@ -54,6 +50,7 @@ public class PermissionChecker extends AppCompatActivity {
 
     }
 
+    // 다른 앱 위에 그리기 권한 체크 함수
     public boolean checkOverlayPermission() {
         if (!Settings.canDrawOverlays(activity)) {
             // 권한 설정이 안된 경우
@@ -63,15 +60,18 @@ public class PermissionChecker extends AppCompatActivity {
             openSettingPage("다른 앱 위에 표시 권한을 설정해주세요", intent);
 
             return false;
-        } else {
-
-            return true;
         }
+
+        return true;
     }
 
     // 스토리지 접근 권한 및 앱의 사용 기록 액세스 권한 체크 함수
     // 권한 있는 경우 true, 없는 경우 유저를 설정 앱으로 보내고 false 리턴
     public boolean checkAccessPermission(){
+
+        NetworkStatsManager networkStatsManager =
+                (NetworkStatsManager) activity.getApplicationContext().
+                        getSystemService(Context.NETWORK_STATS_SERVICE);
 
         try{
             // 아래 코드를 실행해 보고 에러가 없다면 권한이 존재
@@ -99,6 +99,7 @@ public class PermissionChecker extends AppCompatActivity {
         }
     }
 
+    // 설정 페이지로 보내는 함수
     public void openSettingPage(String msg, Intent intent){
         runOnUiThread(new Runnable() {
             @Override
@@ -107,6 +108,8 @@ public class PermissionChecker extends AppCompatActivity {
                 // 알림 생성
                 AlertDialog.Builder builder = new AlertDialog.Builder(activity);
                 builder.setMessage(msg);
+
+                // 알림의 확인 버튼 기능 생성
                 builder.setNegativeButton(
                         "확인",
                         new DialogInterface.OnClickListener() {
@@ -119,13 +122,14 @@ public class PermissionChecker extends AppCompatActivity {
 
                 AlertDialog alertDialog = builder.create();
 
+                // 알림의 확인 버튼 색상 변경
+                // 기본 테마 변경으로 인해 설정 안하면 확인 버튼이 흰색이라 안보임
                 alertDialog.setOnShowListener( new DialogInterface.OnShowListener() {
                     @Override
                     public void onShow(DialogInterface arg0) {
                         alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#000010"));
                     }
                 });
-
                 alertDialog.show();
             }
         });

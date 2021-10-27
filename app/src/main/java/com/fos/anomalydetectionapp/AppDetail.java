@@ -1,6 +1,5 @@
 package com.fos.anomalydetectionapp;
 
-import java.time.LocalDateTime;
 
 // 앱 네트워크 사용 정보 구조체
 public class AppDetail {
@@ -18,10 +17,6 @@ public class AppDetail {
         this.isInWhitelist = isInWhitelist;
     }
 
-    public int getIndex() {
-        return index;
-    }
-
     public String getAppLabel() {
         return appLabel;
     }
@@ -30,15 +25,13 @@ public class AppDetail {
         return appProcessName;
     }
 
-    public int getUid() {
-        return uid;
-    }
+    public int getUid() { return uid; }
 
     public boolean getIsInWhitelist() {
         return isInWhitelist;
     }
 
-    public void setInWhitelist(boolean inWhitelist) {
-        isInWhitelist = inWhitelist;
+    public void setInWhitelist(boolean isInWhitelist) {
+        this.isInWhitelist = isInWhitelist;
     }
 }

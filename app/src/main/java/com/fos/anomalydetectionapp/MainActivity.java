@@ -11,7 +11,6 @@ import android.widget.Button;
 import android.widget.ListView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AppCompatActivity;
-
 import androidx.appcompat.app.ActionBar;
 
 
@@ -21,12 +20,11 @@ public class MainActivity extends AppCompatActivity {
     Button buttonWhitelist;
     @SuppressLint("UseSwitchCompatOrMaterialCode")
     ListView listViewHistory;  // 트래픽 히스토리 목록 리스트뷰
-    HistoryAdapter historyAdapter;  // 리스트뷰 어댑터
+    TrafficHistoryAdapter trafficHistoryAdapter;  // 리스트뷰 어댑터
     String colorRunning = "#41A541";  // 러닝 중일 때 버튼 색상(녹색)
     String colorStopped = "#FFFFFF";  // 중단 됐을 때 버튼 색상(회색)
     Toolbar toolbar;
     ActionBar actionBar;
-    Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,17 +32,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         PermissionChecker permissionChecker = new PermissionChecker(MainActivity.this);
-
         ServiceManager serviceManager = new ServiceManager();
         serviceManager.setArgs(MainActivity.this);
-
         WhitelistManager whitelistManager = new WhitelistManager();
 
         // 뷰 id로 불러오기
         buttonStatus = findViewById(R.id.buttonStatus);
         buttonWhitelist = findViewById(R.id.buttonWhiteList);
         listViewHistory = findViewById(R.id.listViewHistory);
-        historyAdapter = serviceManager.getHistoryAdapter();
+        trafficHistoryAdapter = serviceManager.getHistoryAdapter();
 
         // actionbar setting
         toolbar = findViewById(R.id.toolbar);
@@ -59,15 +55,36 @@ public class MainActivity extends AppCompatActivity {
         boolean isRunning = preferences.getBoolean("isRunning", false);  // 스위치가 켜졌는지 여부
 
         // 리스트뷰, 스위치, 버튼 세팅
-        listViewHistory.setAdapter(historyAdapter);
+        listViewHistory.setAdapter(trafficHistoryAdapter);
         buttonStatus.setBackgroundColor(Color.parseColor(isRunning ? colorRunning:colorStopped));
         buttonStatus.setText(isRunning? "Monitoring":"Start");
 
         if(isRunning){
+            // 모니터링 스위치가 이미 켜진 경우
+
             whitelistManager.initializeApps(MainActivity.this);
             startForegroundService(new Intent(MainActivity.this, ServiceManager.class));
         }
 
+        // 'WHITELIST' 버튼 기능 설정
+        buttonWhitelist.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if(permissionChecker.checkAllPermissions()) {
+                    // 모든 권한이 설정된 경우
+
+                    // 디바이스에 설치된 앱들 정보 세팅
+                    whitelistManager.initializeApps(MainActivity.this);
+
+                    // 화이트 리스트 관리 페이지로 이동
+                    Intent intent = new Intent(getApplicationContext(), WhitelistActivity.class);
+                    startActivity(intent);
+                }
+            }
+        });
+
+        // 'MONITORING' 버튼 기능 설정
         buttonStatus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view){
@@ -76,11 +93,10 @@ public class MainActivity extends AppCompatActivity {
                     // 스위치 켰을 때
 //                      권한 확인
                     if (permissionChecker.checkAllPermissions()) {
-                        // 권한 있는 경우
+                        // 모든 권한 있는 경우
 
+                        // 디바이스에 설치된 앱들 정보 세팅
                         whitelistManager.initializeApps(MainActivity.this);
-
-//                        buttonWhitelist.setEnabled(true);
 
                         // 작동 여부 공유 변수 true로 변경
                         SharedPreferences.Editor editor = getPreferences(Context.MODE_PRIVATE).edit();
@@ -104,20 +120,6 @@ public class MainActivity extends AppCompatActivity {
                     // 오버레이 제거
 //                    startService(new Intent(MainActivity.this, ServiceManager.class));
                     stopService(new Intent(MainActivity.this, ServiceManager.class));
-                }
-            }
-        });
-
-        buttonWhitelist.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                if(permissionChecker.checkAllPermissions()) {
-
-                    whitelistManager.initializeApps(MainActivity.this);
-
-                    Intent intent = new Intent(getApplicationContext(), WhitelistActivity.class);
-                    startActivity(intent);
                 }
             }
         });

@@ -27,8 +27,8 @@ public class TrafficMonitor extends AppCompatActivity {
     TrafficHistory trafficHistory;  // 트래픽 히스토리 내역 리스트
     private final NetworkStatsManager networkStatsManager;  // 어플 별 네트워크 사용 내역 얻을 때 사용
     private final Activity activity;  // 메인 액티비티 context
-    private static LogInternalFileProcessor logFileProcessor;  // 로그 파일 쓰기 위한 객체
-    HistoryAdapter historyAdapter;  // 히스토리 리스트뷰 어댑터
+    private static LogFileProcessor logFileProcessor;  // 로그 파일 쓰기 위한 객체
+    TrafficHistoryAdapter trafficHistoryAdapter;  // 히스토리 리스트뷰 어댑터
     UserEventManager userEventManager;
     private Timer timer;
     ListView listViewHistory;
@@ -36,7 +36,7 @@ public class TrafficMonitor extends AppCompatActivity {
 
 
     // Constructor
-    public TrafficMonitor(Activity activity, HistoryAdapter historyAdapter, TrafficHistory trafficHistory) {
+    public TrafficMonitor(Activity activity, TrafficHistoryAdapter trafficHistoryAdapter, TrafficHistory trafficHistory) {
 
         // 초기화
 //        appNames = new HashMap<>();
@@ -44,8 +44,8 @@ public class TrafficMonitor extends AppCompatActivity {
         isInitialized = false;
         this.trafficHistory = trafficHistory;
         this.activity = activity;
-        this.historyAdapter = historyAdapter;
-        logFileProcessor = new LogInternalFileProcessor();
+        this.trafficHistoryAdapter = trafficHistoryAdapter;
+        logFileProcessor = new LogFileProcessor();
         whitelistManager = new WhitelistManager();
         userEventManager = new UserEventManager(activity, whitelistManager);
         listViewHistory = activity.findViewById(R.id.listViewHistory);
@@ -146,7 +146,7 @@ public class TrafficMonitor extends AppCompatActivity {
                     @Override
                     public void run() {
                         // 어댑터 업데이트
-                        listViewHistory.setAdapter(historyAdapter);
+                        listViewHistory.setAdapter(trafficHistoryAdapter);
                     }
                 });
             }
