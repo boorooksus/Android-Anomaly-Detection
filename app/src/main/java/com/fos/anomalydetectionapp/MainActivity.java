@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         ServiceManager serviceManager = new ServiceManager();
         serviceManager.setArgs(MainActivity.this);
 
-        AppsManager appsManager = new AppsManager();
+        WhitelistManager whitelistManager = new WhitelistManager();
 
         // 뷰 id로 불러오기
         buttonStatus = findViewById(R.id.buttonStatus);
@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
         buttonStatus.setText(isRunning? "Monitoring":"Start");
 
         if(isRunning){
-            appsManager.initializeApps(MainActivity.this);
+            whitelistManager.initializeApps(MainActivity.this);
             startForegroundService(new Intent(MainActivity.this, ServiceManager.class));
         }
 
@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
                     if (permissionChecker.checkAllPermissions()) {
                         // 권한 있는 경우
 
-                        appsManager.initializeApps(MainActivity.this);
+                        whitelistManager.initializeApps(MainActivity.this);
 
 //                        buttonWhitelist.setEnabled(true);
 
@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if(permissionChecker.checkAllPermissions()) {
 
-                    appsManager.initializeApps(MainActivity.this);
+                    whitelistManager.initializeApps(MainActivity.this);
 
                     Intent intent = new Intent(getApplicationContext(), WhitelistActivity.class);
                     startActivity(intent);

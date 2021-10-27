@@ -5,9 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ListView;
 
 public class WhitelistActivity extends AppCompatActivity {
@@ -16,7 +14,7 @@ public class WhitelistActivity extends AppCompatActivity {
     ActionBar actionBar;
     ListView listViewWhitelist;
     WhitelistAdapter whitelistAdapter;
-    AppsManager appsManager;
+    WhitelistManager whitelistManager;
 
 
     @Override
@@ -34,13 +32,13 @@ public class WhitelistActivity extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
 
 //        AppsManager appsManager = new AppsManager(WhitelistActivity.this);
-        appsManager = new AppsManager();
+        whitelistManager = new WhitelistManager();
 
 //        appsManager.setArgs(WhitelistActivity.this);
 //        appsManager.initializeApps();
 
         listViewWhitelist = findViewById(R.id.listViewWhitelist);
-        whitelistAdapter = new WhitelistAdapter(WhitelistActivity.this, appsManager);
+        whitelistAdapter = new WhitelistAdapter(WhitelistActivity.this, whitelistManager);
 
         listViewWhitelist.setAdapter(whitelistAdapter);
 
@@ -55,14 +53,14 @@ public class WhitelistActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
 
-        appsManager.saveWhiteSet();
+        whitelistManager.saveWhiteSet();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case android.R.id.home:{ //toolbar의 back키 눌렀을 때 동작
-                appsManager.saveWhiteSet();
+                whitelistManager.saveWhiteSet();
                 finish();
                 return true;
             }

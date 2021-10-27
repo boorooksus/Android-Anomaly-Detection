@@ -3,7 +3,6 @@ package com.fos.anomalydetectionapp;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.graphics.Typeface;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,27 +15,27 @@ import java.util.Optional;
 // 네트워크 히스토리 리스트뷰 어댑터
 public class WhitelistAdapter extends BaseAdapter {
 
-    AppsManager appsManager;  // 트래픽 히스토리 목록 인스턴스
+    WhitelistManager whitelistManager;  // 트래픽 히스토리 목록 인스턴스
     LayoutInflater layoutInflater;
     Activity activity;  // 메인 액티비티 컨텍스트
     boolean isInWhitelist;
 
     // Constructor
-    public WhitelistAdapter(Activity activity, AppsManager appsManager) {
+    public WhitelistAdapter(Activity activity, WhitelistManager whitelistManager) {
         this.activity = activity;
-        this.appsManager = appsManager;
+        this.whitelistManager = whitelistManager;
         layoutInflater = LayoutInflater.from(activity);
     }
 
     @Override
     public int getCount() {
-        return appsManager.getLength();
+        return whitelistManager.getLength();
     }
 
     // 수정 필요
     @Override
     public AppDetail getItem(int position) {
-        return appsManager.getAppDetail(position);
+        return whitelistManager.getAppDetail(position);
     }
 
     @Override
@@ -51,7 +50,7 @@ public class WhitelistAdapter extends BaseAdapter {
         // res/layout/istview_custom.xml 가져옴
         @SuppressLint("ViewHolder") View view = layoutInflater.inflate(R.layout.listview_whitelist, null);
 //        TrafficDetail trafficDetail = trafficHistory.getTraffic(position);
-        AppDetail appDetail = appsManager.getAppDetail(position);
+        AppDetail appDetail = whitelistManager.getAppDetail(position);
 
         String appName = Optional.ofNullable(appDetail.getAppLabel()).orElse("untitled");
         String appProcessName = Optional.ofNullable(appDetail.getAppProcessName()).orElse("untitled");
@@ -79,7 +78,7 @@ public class WhitelistAdapter extends BaseAdapter {
 
                 isInWhitelist = !appDetail.getIsInWhitelist();
 
-                appsManager.setAppDetail(position, isInWhitelist);
+                whitelistManager.setAppDetail(position, isInWhitelist);
 
                 if(isInWhitelist)
                     button.setImageResource(R.drawable.check);

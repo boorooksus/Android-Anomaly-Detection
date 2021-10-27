@@ -14,7 +14,6 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.IBinder;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -65,26 +64,18 @@ public class ServiceManager extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-//        Log.v("Service", "=======Service is Started...");
-
-//        if (intent.getAction().equals("stop")) {
-//            stopForeground(true);
-//            stopSelf();
-//        }
-
         setNotification();
 
         trafficHistory = new TrafficHistory();
         historyAdapter = new HistoryAdapter(activity, trafficHistory);
-//        AppsManager appsManager = new AppsManager(activity);
-        AppsManager appsManager = new AppsManager();
-        userEventManager = new UserEventManager(activity, appsManager);
+        WhitelistManager whitelistManager = new WhitelistManager();
+        userEventManager = new UserEventManager(activity, whitelistManager);
         trafficMonitor = new TrafficMonitor(activity, historyAdapter, trafficHistory);
 
-        startTrafficMonitoring();
-//        trafficMonitor.startMonitoring();
-        createOverlay();
+//        startTrafficMonitoring();
+        trafficMonitor.startMonitoring();
 
+        createOverlay();
 
         return Service.START_STICKY;
     }
@@ -97,36 +88,31 @@ public class ServiceManager extends Service {
         return historyAdapter;
     }
 
-    public void startTrafficMonitoring(){
-        listViewHistory = activity.findViewById(R.id.listViewHistory);
-
-        // 일정 시간 간격으로 앱별 네트워크 사용량 체크하는 타이머
-
-        TimerTask timerTask = new TimerTask() {
-            @Override
-            public void run() {
-
-                if(trafficMonitor != null)
-                    trafficMonitor.detectTraffic();
-
-                activity.runOnUiThread(new Runnable(){
-                    @Override
-                    public void run() {
-
-                        listViewHistory.setAdapter(historyAdapter);
-                    }
-                });
-
-//                if (preferences != null && !preferences.getBoolean("isRunning", false))
-//                    timer.cancel();
-            }
-        };
-
-
-        timer = new Timer();
-        // 타이머들을 각각 20초, 10로 설정하고 작동
-        timer.schedule(timerTask, 0, 20000);
-    }
+//    public void startTrafficMonitoring(){
+//        listViewHistory = activity.findViewById(R.id.listViewHistory);
+//
+//        // 일정 시간 간격으로 앱별 네트워크 사용량 체크하는 타이머 설정
+//        TimerTask timerTask = new TimerTask() {
+//            @Override
+//            public void run() {
+//
+//                if(trafficMonitor != null)
+//                    trafficMonitor.detectTraffic();
+//
+//                activity.runOnUiThread(new Runnable(){
+//                    @Override
+//                    public void run() {
+//
+//                        listViewHistory.setAdapter(historyAdapter);
+//                    }
+//                });
+//            }
+//        };
+//
+//        timer = new Timer();
+//        // 타이머들을 각각 20초, 10로 설정하고 작동
+//        timer.schedule(timerTask, 0, 20000);
+//    }
 
     public void createOverlay(){
         LayoutInflater inflate = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -185,33 +171,13 @@ public class ServiceManager extends Service {
         startForeground(2, notification);
     }
 
-//    public void stopForegroundService(){
-//
-//        stopForeground(true);
-//        stopSelf();
-//
-//        if(timer != null)
-//            timer.cancel();
-//
-//        if(wm != null) {
-//            if(mView != null) {
-//                wm.removeView(mView);
-//                mView = null;
-//            }
-//            wm = null;
-//        }
-//
-//    }
-
     @Override
     public void onDestroy() {
         super.onDestroy();
+
         // stop monitoring
-//        threadMonitoring.interrupt();
-
-//        trafficMonitor.stopMonitoring();
-        timer.cancel();
-
+        trafficMonitor.stopMonitoring();
+//        timer.cancel();
 
         // terminate overlay
         if(wm != null) {

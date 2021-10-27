@@ -10,27 +10,17 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.net.NetworkCapabilities;
 import android.os.RemoteException;
-import android.preference.PreferenceManager;
-import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.Vector;
 
-public class AppsManager extends AppCompatActivity {
+public class WhitelistManager extends AppCompatActivity {
 
     private static Activity activity;
     private static ArrayList<AppDetail> appDetails;
@@ -41,7 +31,7 @@ public class AppsManager extends AppCompatActivity {
 
     public void initializeApps(Activity activity){
 
-        AppsManager.activity = activity;
+        WhitelistManager.activity = activity;
 
         if(appDetails != null)
             return;
