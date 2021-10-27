@@ -16,6 +16,7 @@ import android.util.Log;
 import androidx.appcompat.app.AppCompatActivity;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Array;
@@ -26,25 +27,38 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.Vector;
 
 public class AppsManager extends AppCompatActivity {
 
-    Activity activity;
+    private static Activity activity;
     private static ArrayList<AppDetail> appDetails;
     private static HashMap<Integer, Integer> appIndex;
+    private static HashSet<Integer> appSet;
+    private static HashSet<String> whiteSet;
+    private boolean isInitialized = false;
+    Context context;
 
 
-    public void initializeApps(){
+    public void initializeApps(Activity activity, Context context){
+
+        this.activity = activity;
+        this.context = context;
 
         if(appDetails != null)
             return;
 
-        PackageManager pm = activity.getPackageManager();
+        whiteSet = loadWhiteSet(context, "whiteSet");
+
+        if (!whiteSet.isEmpty()){
+            isInitialized = true;
+        }
+
+        appSet = new HashSet<>();
         appDetails = new ArrayList<>();
         appIndex = new HashMap<>();
-        HashSet<Integer> appSet = new HashSet<>();
-
+        PackageManager pm = activity.getPackageManager();
 
         NetworkStatsManager networkStatsManager = (NetworkStatsManager) activity.getApplicationContext().
                 getSystemService(Context.NETWORK_STATS_SERVICE);
@@ -82,27 +96,31 @@ public class AppsManager extends AppCompatActivity {
 
             boolean isSafe = false;
 
-            if (processName.contains("com.android") || processName.contains("com.google")
-                    || processName.contains("com.lge") || processName.contains("android.process"))
+            if(isInitialized && whiteSet.contains(processName))
                 isSafe = true;
+
+            else if (!isInitialized && (processName.contains("com.android") || processName.contains("com.google")
+                    || processName.contains("com.lge") || processName.contains("android.process"))) {
+                isSafe = true;
+                whiteSet.add(processName);
+            }
 
             AppDetail appDetail = new AppDetail(i, appName, processName, uid, isSafe);
             appDetails.add(appDetail);
             appIndex.put(uid, i);
             i++;
         }
-
-    }
-
-
-    public void setArgs(Activity activity){
-        this.activity = activity;
     }
 
     public void setAppDetail(int position, boolean isSafe){
         AppDetail temp = appDetails.get(position);
         temp.setInWhitelist(isSafe);
         appDetails.set(position, temp);
+
+        if (isSafe)
+            whiteSet.add(temp.getAppProcessName());
+        else
+            whiteSet.remove(temp.getAppProcessName());
 
     }
 
@@ -121,42 +139,74 @@ public class AppsManager extends AppCompatActivity {
         return Optional.ofNullable(appIndex.get(uid)).orElse(-1);
     }
 
-//    public void updateSettings(){
-//        saveAppDetails(activity, appDetails);
-//    }
+    public void updateWhitelist(){
+        saveWhiteSet(context, "whiteSet", whiteSet);
+    }
+
+    // HashMap 저장
+    public void saveWhiteSet(Context context, String key, HashSet<String> whiteSet) {
+
+        SharedPreferences prefs = activity.getSharedPreferences("whiteSet", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+
+
+//        SharedPreferences.Editor editor = getPreferences(Context.MODE_PRIVATE).edit();
+        Log.v("=====================", "+++++++++++++++++++++++++++++");
+        editor.putStringSet(key, whiteSet);
+        editor.apply(); // 스위치 상태 변수 저장
+
+//        JSONArray a = new JSONArray();
 //
-//    // HashMap 저장
-//    public void saveAppDetails(Context context, ArrayList<AppDetail> appDetails) {
-//        SharedPreferences mmPref = context.getSharedPreferences("pref", Context.MODE_PRIVATE);
-//        if (mmPref != null) {
-//            JSONObject jsonObject = new JSONObject((Map) appDetails);
-//            String jsonString = jsonObject.toString();
-//            SharedPreferences.Editor editor = mmPref.edit();
-//            editor.remove("AppDetails").apply();
-//            editor.putString("AppDetails", jsonString);
-//            editor.apply();
+//        // Iterator 사용
+//        for (String s : whiteSet) {
+//            a.put(s);
 //        }
-//    }
 //
-//    // HashMap 불러오기
-//    public ArrayList<AppDetail> loadAppDetails(Context context) {
-//        ArrayList<AppDetail> outputList = new ArrayList<AppDetail>();
-//        SharedPreferences mmPref = context.getSharedPreferences("pref", Context.MODE_PRIVATE);
-//        try {
-//            if (mmPref != null) {
-//                String jsonString = mmPref.getString("AppDetails", (new JSONObject()).toString());
-//                JSONObject jsonObject = new JSONObject(jsonString);
-//
-//                Iterator<String> keysItr = jsonObject.keys();
-//                while (keysItr.hasNext()) {
-//                    String key = keysItr.next();
-//                    AppDetail value = (AppDetail) jsonObject.get(key);
-//                    outputList.add(value);
+//        if (!whiteSet.isEmpty()) {
+//            editor.putString(key, a.toString());
+//        } else {
+//            editor.putString(key, null);
+//        }
+
+
+        editor.apply();
+
+        Log.v("===============Save whiteSet", "save Success!!!");
+    }
+
+    // HashMap 불러오기
+    public HashSet<String> loadWhiteSet(Context context, String key) {
+
+//        SharedPreferences prefs = context.getSharedPreferences(key, MODE_PRIVATE);
+
+//        SharedPreferences prefs = getPreferences(MODE_PRIVATE);
+        SharedPreferences prefs = activity.getSharedPreferences("whiteSet", Context.MODE_PRIVATE);
+
+        Set<String> result = prefs.getStringSet(key, new HashSet<>());
+
+        return (HashSet<String>) result;
+
+
+//        String json = prefs.getString(key, null);
+//        HashSet<String> urls = new HashSet<>();
+//        if (json != null) {
+//            try {
+//                JSONArray a = new JSONArray(json);
+//                for (int i = 0; i < a.length(); i++) {
+//                    String url = a.optString(i);
+//                    urls.add(url);
 //                }
+//            } catch (JSONException e) {
+//                e.printStackTrace();
 //            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
 //        }
-//        return outputList;
-//    }
+//
+//        if (urls.isEmpty())
+//            Log.v("==============Load whiteSet", "Load Fail!!!");
+//        else
+//            Log.v("==============Load whiteSet", "Load Success!!!");
+//
+//
+//        return urls;
+    }
 }

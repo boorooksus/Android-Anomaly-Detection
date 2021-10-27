@@ -51,6 +51,7 @@ public class WhitelistActivity extends AppCompatActivity {
     }
 
     public void backHandler(View view){
+        appsManager.updateWhitelist();
         finish();
     }
 
@@ -58,9 +59,7 @@ public class WhitelistActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case android.R.id.home:{ //toolbar의 back키 눌렀을 때 동작
-
-//                appsManager.updateSettings();
-
+                appsManager.updateWhitelist();
                 finish();
                 return true;
             }

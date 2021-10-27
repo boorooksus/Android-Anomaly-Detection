@@ -26,11 +26,14 @@ public class MainActivity extends AppCompatActivity {
     String colorStopped = "#FFFFFF";  // 중단 됐을 때 버튼 색상(회색)
     Toolbar toolbar;
     ActionBar actionBar;
+    Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        context = getApplicationContext();
 
         PermissionChecker permissionChecker = new PermissionChecker(MainActivity.this);
 
@@ -58,7 +61,6 @@ public class MainActivity extends AppCompatActivity {
         actionBar.setDisplayShowCustomEnabled(true);
         actionBar.setDisplayShowTitleEnabled(false);
 
-
         // 마지막 스위치 상태 가져오기
         SharedPreferences preferences = getPreferences(MODE_PRIVATE);
         boolean isRunning = preferences.getBoolean("isRunning", false);  // 스위치가 켜졌는지 여부
@@ -69,15 +71,9 @@ public class MainActivity extends AppCompatActivity {
         buttonStatus.setText(isRunning? "Monitoring":"Start");
 
         if(isRunning){
-
-            appsManager.setArgs(MainActivity.this);
-            appsManager.initializeApps();
-
+            appsManager.initializeApps(MainActivity.this, context);
             startForegroundService(new Intent(MainActivity.this, ServiceManager.class));
         }
-//        else{
-//            buttonWhitelist.setEnabled(false);
-//        }
 
         buttonStatus.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,8 +85,7 @@ public class MainActivity extends AppCompatActivity {
                     if (permissionChecker.checkAllPermissions()) {
                         // 권한 있는 경우
 
-                        appsManager.setArgs(MainActivity.this);
-                        appsManager.initializeApps();
+                        appsManager.initializeApps(MainActivity.this, context);
 
 //                        buttonWhitelist.setEnabled(true);
 
@@ -104,7 +99,6 @@ public class MainActivity extends AppCompatActivity {
 
                         buttonStatus.setBackgroundColor(Color.parseColor(colorRunning));
                         buttonStatus.setText("MONITORING");
-
                     }
                 } else {
                     // 스위치 끄면 모니터링 중지
@@ -117,10 +111,7 @@ public class MainActivity extends AppCompatActivity {
                     // 오버레이 제거
 //                    startService(new Intent(MainActivity.this, ServiceManager.class));
                     stopService(new Intent(MainActivity.this, ServiceManager.class));
-
-
                 }
-
             }
         });
 
@@ -130,14 +121,11 @@ public class MainActivity extends AppCompatActivity {
 
                 if(permissionChecker.checkAllPermissions()) {
 
-                    appsManager.setArgs(MainActivity.this);
-                    appsManager.initializeApps();
+                    appsManager.initializeApps(MainActivity.this, context);
 
                     Intent intent = new Intent(getApplicationContext(), WhitelistActivity.class);
                     startActivity(intent);
                 }
-
-
             }
         });
     }
