@@ -35,27 +35,24 @@ public class AppsManager extends AppCompatActivity {
     private static Activity activity;
     private static ArrayList<AppDetail> appDetails;
     private static HashMap<Integer, Integer> appIndex;
-    private static HashSet<Integer> appSet;
     private static HashSet<String> whiteSet;
     private boolean isInitialized = false;
-    Context context;
 
 
-    public void initializeApps(Activity activity, Context context){
+    public void initializeApps(Activity activity){
 
-        this.activity = activity;
-        this.context = context;
+        AppsManager.activity = activity;
 
         if(appDetails != null)
             return;
 
-        whiteSet = loadWhiteSet(context, "whiteSet");
+        whiteSet = loadWhiteSet();
 
         if (!whiteSet.isEmpty()){
             isInitialized = true;
         }
 
-        appSet = new HashSet<>();
+        HashSet<Integer> appSet = new HashSet<>();
         appDetails = new ArrayList<>();
         appIndex = new HashMap<>();
         PackageManager pm = activity.getPackageManager();
@@ -122,6 +119,7 @@ public class AppsManager extends AppCompatActivity {
         else
             whiteSet.remove(temp.getAppProcessName());
 
+
     }
 
     // 저장된 히스토리 개수 리턴
@@ -139,74 +137,23 @@ public class AppsManager extends AppCompatActivity {
         return Optional.ofNullable(appIndex.get(uid)).orElse(-1);
     }
 
-    public void updateWhitelist(){
-        saveWhiteSet(context, "whiteSet", whiteSet);
-    }
-
     // HashMap 저장
-    public void saveWhiteSet(Context context, String key, HashSet<String> whiteSet) {
+    public void saveWhiteSet() {
 
         SharedPreferences prefs = activity.getSharedPreferences("whiteSet", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
 
+        editor.clear();
 
-//        SharedPreferences.Editor editor = getPreferences(Context.MODE_PRIVATE).edit();
-        Log.v("=====================", "+++++++++++++++++++++++++++++");
-        editor.putStringSet(key, whiteSet);
-        editor.apply(); // 스위치 상태 변수 저장
-
-//        JSONArray a = new JSONArray();
-//
-//        // Iterator 사용
-//        for (String s : whiteSet) {
-//            a.put(s);
-//        }
-//
-//        if (!whiteSet.isEmpty()) {
-//            editor.putString(key, a.toString());
-//        } else {
-//            editor.putString(key, null);
-//        }
-
-
+        editor.putStringSet("whiteSetKey", whiteSet);
         editor.apply();
-
-        Log.v("===============Save whiteSet", "save Success!!!");
     }
 
     // HashMap 불러오기
-    public HashSet<String> loadWhiteSet(Context context, String key) {
-
-//        SharedPreferences prefs = context.getSharedPreferences(key, MODE_PRIVATE);
-
-//        SharedPreferences prefs = getPreferences(MODE_PRIVATE);
+    public HashSet<String> loadWhiteSet() {
         SharedPreferences prefs = activity.getSharedPreferences("whiteSet", Context.MODE_PRIVATE);
-
-        Set<String> result = prefs.getStringSet(key, new HashSet<>());
+        Set<String> result = prefs.getStringSet("whiteSetKey", new HashSet<>());
 
         return (HashSet<String>) result;
-
-
-//        String json = prefs.getString(key, null);
-//        HashSet<String> urls = new HashSet<>();
-//        if (json != null) {
-//            try {
-//                JSONArray a = new JSONArray(json);
-//                for (int i = 0; i < a.length(); i++) {
-//                    String url = a.optString(i);
-//                    urls.add(url);
-//                }
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//
-//        if (urls.isEmpty())
-//            Log.v("==============Load whiteSet", "Load Fail!!!");
-//        else
-//            Log.v("==============Load whiteSet", "Load Success!!!");
-//
-//
-//        return urls;
     }
 }
