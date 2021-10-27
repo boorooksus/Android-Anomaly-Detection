@@ -44,36 +44,8 @@ public class PermissionChecker extends AppCompatActivity {
         PowerManager powerManager = (PowerManager) activity.getSystemService(Context.POWER_SERVICE);
         if (!powerManager.isIgnoringBatteryOptimizations(activity.getPackageName())) {
             // 화이트 리스트 등록 안됨.
-
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-
-                    // 알림 생성
-                    AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                    builder.setMessage("절전 기능 예외 앱을 설정해주세요.");
-                    builder.setNegativeButton(
-                            "확인",
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which)
-                                {
-                                    activity.startActivity(new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS));
-                                }
-                            });
-
-                    AlertDialog alertDialog = builder.create();
-
-                    alertDialog.setOnShowListener( new DialogInterface.OnShowListener() {
-                        @Override
-                        public void onShow(DialogInterface arg0) {
-                            alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#000010"));
-                        }
-                    });
-
-                    alertDialog.show();
-                }
-            });
+            Intent intent = new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+            openSettingPage("절전 기능 예외 앱을 설정해주세요.", intent);
 
             return false;
         }
@@ -86,41 +58,9 @@ public class PermissionChecker extends AppCompatActivity {
         if (!Settings.canDrawOverlays(activity)) {
             // 권한 설정이 안된 경우
 
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-
-                    // 알림 생성
-                    AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                    builder.setMessage("다른 앱 위에 표시 권한을 설정해주세요");
-                    builder.setNegativeButton(
-                            "확인",
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which)
-                                {
-                                    // 유저를 설정 페이지로 보냄
-                                    Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                                             Uri.parse("package:" + activity.getPackageName()));
-                                    activity.startActivityForResult(intent, TYPE_APPLICATION_OVERLAY);
-
-//                                    activity.startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
-                                    //finish();
-                                }
-                            });
-
-                    AlertDialog alertDialog = builder.create();
-
-                    alertDialog.setOnShowListener( new DialogInterface.OnShowListener() {
-                        @Override
-                        public void onShow(DialogInterface arg0) {
-                            alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#000010"));
-                        }
-                    });
-
-                    alertDialog.show();
-                }
-            });
+            openSettingPage("다른 앱 위에 표시 권한을 설정해주세요", intent);
 
             return false;
         } else {
@@ -140,7 +80,7 @@ public class PermissionChecker extends AppCompatActivity {
                     networkStatsManager.queryDetailsForUid(
                             NetworkCapabilities.TRANSPORT_WIFI,
                             "",
-                            0,
+                            System.currentTimeMillis() - 1000,
                             System.currentTimeMillis(),
                             0);
             networkStats.close();
@@ -151,42 +91,43 @@ public class PermissionChecker extends AppCompatActivity {
 
             // 위에서 에러가 존재한다면 권한이 제한되어 있음
             // 유저를 설정 페이지로 보냄
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
 
-                    // 알림 생성
-                    AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                    builder.setMessage("앱의 사용 기록 액세스를 허용해주세요");
-                    builder.setNegativeButton(
-                            "확인",
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which)
-                                {
-                                    // 유저를 설정 페이지로 보냄
-//                                    Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS,
-//                                            Uri.parse("package:" + activity.getPackageName()));
-//                                    activity.startActivityForResult(intent, TYPE_APPLICATION_OVERLAY);
-                                    activity.startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
-                                    //ACTION_MANAGE_OVERLAY_PERMISSION
-                                    //finish();
-                                }
-                            });
+            Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+            openSettingPage("앱의 사용 기록 액세스를 허용해주세요", intent);
 
-                    AlertDialog alertDialog = builder.create();
-
-                    alertDialog.setOnShowListener( new DialogInterface.OnShowListener() {
-                        @Override
-                        public void onShow(DialogInterface arg0) {
-                            alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#000010"));
-                        }
-                    });
-
-                    alertDialog.show();
-                }
-            });
             return false;
         }
+    }
+
+    public void openSettingPage(String msg, Intent intent){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                // 알림 생성
+                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                builder.setMessage(msg);
+                builder.setNegativeButton(
+                        "확인",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                activity.startActivity(intent);
+                            }
+                        });
+
+                AlertDialog alertDialog = builder.create();
+
+                alertDialog.setOnShowListener( new DialogInterface.OnShowListener() {
+                    @Override
+                    public void onShow(DialogInterface arg0) {
+                        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#000010"));
+                    }
+                });
+
+                alertDialog.show();
+            }
+        });
     }
 }
