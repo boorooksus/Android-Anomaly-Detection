@@ -2,6 +2,7 @@ package com.fos.anomalydetectionapp;
 
 import static android.view.WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.usage.NetworkStats;
@@ -12,18 +13,21 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.NetworkCapabilities;
 import android.net.Uri;
+import android.os.PowerManager;
 import android.provider.Settings;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 public class PermissionChecker extends AppCompatActivity {
 
-    private final Activity activity;
+    @SuppressLint("StaticFieldLeak")
+    private static Activity activity;
     private final NetworkStatsManager networkStatsManager; // 어플 별 네트워크 사용 내역 얻을 때 사용
 
 
     public PermissionChecker(Activity activity) {
-        this.activity = activity;
+        PermissionChecker.activity = activity;
 
         networkStatsManager =
                 (NetworkStatsManager) activity.getApplicationContext().
@@ -31,42 +35,48 @@ public class PermissionChecker extends AppCompatActivity {
     }
 
     public boolean checkAllPermissions(){
-        return checkAccessPermission() && checkOverlayPermission();
+        return checkIgnoreBatteryOptimization() && checkAccessPermission() && checkOverlayPermission();
     }
 
-    public boolean checkDoNotDisturb(){
+    @SuppressLint("BatteryLife")
+    public boolean checkIgnoreBatteryOptimization(){
 
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
+        PowerManager powerManager = (PowerManager) activity.getSystemService(Context.POWER_SERVICE);
+        if (!powerManager.isIgnoringBatteryOptimizations(activity.getPackageName())) {
+            // 화이트 리스트 등록 안됨.
 
-                // 알림 생성
-                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                builder.setMessage("절전 기능 예외 앱을 설정해주세요.");
-                builder.setNegativeButton(
-                        "확인",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which)
-                            {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
 
-                                activity.startActivity(new Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS));
+                    // 알림 생성
+                    AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                    builder.setMessage("절전 기능 예외 앱을 설정해주세요.");
+                    builder.setNegativeButton(
+                            "확인",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which)
+                                {
+                                    activity.startActivity(new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS));
+                                }
+                            });
 
-                            }
-                        });
+                    AlertDialog alertDialog = builder.create();
 
-                AlertDialog alertDialog = builder.create();
+                    alertDialog.setOnShowListener( new DialogInterface.OnShowListener() {
+                        @Override
+                        public void onShow(DialogInterface arg0) {
+                            alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#000010"));
+                        }
+                    });
 
-                alertDialog.setOnShowListener( new DialogInterface.OnShowListener() {
-                    @Override
-                    public void onShow(DialogInterface arg0) {
-                        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#000010"));
-                    }
-                });
+                    alertDialog.show();
+                }
+            });
 
-                alertDialog.show();
-            }
-        });
+            return false;
+        }
 
         return true;
 

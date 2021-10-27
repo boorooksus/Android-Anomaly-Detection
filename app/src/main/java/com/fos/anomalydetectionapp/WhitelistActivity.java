@@ -44,15 +44,18 @@ public class WhitelistActivity extends AppCompatActivity {
 
         listViewWhitelist.setAdapter(whitelistAdapter);
 
-//        Log.v("Apps info test=====", appsManager.getLength() + "");
-//        Log.v("Apps info test=====", appsManager.getAppDetail(0).getAppLabel() + "");
-
-
     }
 
-    public void backHandler(View view){
+//    public void backHandler(View view){
+//
+//        finish();
+//    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
         appsManager.saveWhiteSet();
-        finish();
     }
 
     @Override
