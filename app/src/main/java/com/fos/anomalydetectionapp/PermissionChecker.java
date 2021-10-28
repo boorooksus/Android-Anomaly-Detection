@@ -42,7 +42,7 @@ public class PermissionChecker extends AppCompatActivity {
             // 절전 기능 제외 앱이 아닌 경우
 
             Intent intent = new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
-            openSettingPage("절전 기능 예외 앱을 설정해주세요.", intent);
+            openSettingPage("Disable Battery Optimization\nof this app", intent);
 
             return false;
         }
@@ -58,7 +58,7 @@ public class PermissionChecker extends AppCompatActivity {
 
             Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                                             Uri.parse("package:" + activity.getPackageName()));
-            openSettingPage("다른 앱 위에 표시 권한을 설정해주세요", intent);
+            openSettingPage("Allow Manage Overlay permission", intent);
 
             return false;
         }
@@ -94,7 +94,7 @@ public class PermissionChecker extends AppCompatActivity {
             // 유저를 설정 페이지로 보냄
 
             Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
-            openSettingPage("앱의 사용 기록 액세스를 허용해주세요", intent);
+            openSettingPage("Allow Usage Access permission", intent);
 
             return false;
         }
@@ -112,7 +112,7 @@ public class PermissionChecker extends AppCompatActivity {
 
                 // 알림의 확인 버튼 기능 생성
                 builder.setNegativeButton(
-                        "확인",
+                        "OK",
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which)
