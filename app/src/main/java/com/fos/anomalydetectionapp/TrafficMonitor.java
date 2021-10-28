@@ -31,10 +31,10 @@ public class TrafficMonitor extends AppCompatActivity {
     private final NetworkStatsManager networkStatsManager;  // 어플 별 네트워크 사용 내역 얻을 때 사용
     private final Activity activity;  // 메인 액티비티 context
     private static LogFileProcessor logFileProcessor;  // 로그 파일 쓰기 위한 객체
-    TrafficHistoryAdapter trafficHistoryAdapter;  // 히스토리 리스트뷰 어댑터
+    ListView listViewHistory;  // 트래픽 내역 리스트뷰
+    TrafficHistoryAdapter trafficHistoryAdapter;  // 트래픽 히스토리 리스트뷰 어댑터
     UserEventManager userEventManager;
-    private static Timer timer;
-    ListView listViewHistory;
+    private static Timer timer;  // 모니터링 타이머
     WhitelistManager whitelistManager;
 
 
@@ -42,7 +42,6 @@ public class TrafficMonitor extends AppCompatActivity {
     public TrafficMonitor(Activity activity, TrafficHistoryAdapter trafficHistoryAdapter, TrafficHistory trafficHistory) {
 
         // 초기화
-//        appNames = new HashMap<>();
         lastUsage = new HashMap<>();
         isInitialized = false;
         this.trafficHistory = trafficHistory;
@@ -55,7 +54,27 @@ public class TrafficMonitor extends AppCompatActivity {
         networkStatsManager =
                 (NetworkStatsManager) activity.getApplicationContext().
                         getSystemService(Context.NETWORK_STATS_SERVICE);
+    }
 
+    // 모니터링 시작 함수
+    public void startMonitoring(){
+
+        timer = new Timer();
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                // 트래픽 탐지
+                detectTraffic();
+            }
+        };
+
+        // 타이머 주기를 20초로 설정하고 작동
+        timer.schedule(timerTask, 0, 20000);
+    }
+
+    // 모니터링 정지 함수
+    public void stopMonitoring(){
+        timer.cancel();
     }
 
     // 앱별 네트워크 사용량을 구하고 업데이트 하는 함수
@@ -119,6 +138,8 @@ public class TrafficMonitor extends AppCompatActivity {
                             TrafficDetail trafficDetail = new TrafficDetail(LocalDateTime.now(), appLabel, processName, uid, usage, risk);
                             trafficHistory.addTraffic(trafficDetail);
 
+                            listViewHistory.setAdapter(trafficHistoryAdapter);
+
                             // 로그 파일에 저장
                             logFileProcessor.writeLog(activity, trafficDetail);
 
@@ -151,31 +172,5 @@ public class TrafficMonitor extends AppCompatActivity {
         // 한 번이라도 여기까지 진행된다면 초기화가 완료된 것임
         // 초기화를 하지 않으면 같은 트래픽 내역이 반복적으로 탐지됨
         isInitialized = true;
-    }
-
-    public void startMonitoring(){
-
-        timer = new Timer();
-        TimerTask timerTask = new TimerTask() {
-            @Override
-            public void run() {
-                detectTraffic();
-
-                activity.runOnUiThread(new Runnable(){
-                    @Override
-                    public void run() {
-                        // 어댑터 업데이트
-                        listViewHistory.setAdapter(trafficHistoryAdapter);
-                    }
-                });
-            }
-        };
-
-        // 타이머들을 각각 20초, 10로 설정하고 작동
-        timer.schedule(timerTask, 0, 20000);
-    }
-
-    public void stopMonitoring(){
-        timer.cancel();
     }
 }

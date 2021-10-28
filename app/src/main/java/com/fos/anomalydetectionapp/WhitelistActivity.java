@@ -3,11 +3,11 @@ package com.fos.anomalydetectionapp;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.ListView;
 
+// 화이트리스트 관리 액티비티
 public class WhitelistActivity extends AppCompatActivity {
 
     Toolbar toolbar;
@@ -15,7 +15,6 @@ public class WhitelistActivity extends AppCompatActivity {
     ListView listViewWhitelist;
     WhitelistAdapter whitelistAdapter;
     WhitelistManager whitelistManager;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,39 +30,29 @@ public class WhitelistActivity extends AppCompatActivity {
         actionBar.setDisplayShowTitleEnabled(false);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-//        AppsManager appsManager = new AppsManager(WhitelistActivity.this);
         whitelistManager = new WhitelistManager();
-
-//        appsManager.setArgs(WhitelistActivity.this);
-//        appsManager.initializeApps();
-
         listViewWhitelist = findViewById(R.id.listViewWhitelist);
         whitelistAdapter = new WhitelistAdapter(WhitelistActivity.this, whitelistManager);
-
         listViewWhitelist.setAdapter(whitelistAdapter);
 
     }
 
-//    public void backHandler(View view){
-//
-//        finish();
-//    }
-
+    // 디바이스 back키 누른 경우 동작 설정
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-
+        // 화이트 리스트 세팅 업데이트
         whitelistManager.saveWhiteSet();
     }
 
+    //toolbar의 back키 눌렀을 때 동작
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
-            case android.R.id.home:{ //toolbar의 back키 눌렀을 때 동작
-                whitelistManager.saveWhiteSet();
-                finish();
-                return true;
-            }
+        if (item.getItemId() == android.R.id.home) {
+            // 화이트 리스트 세팅 업데이트
+            whitelistManager.saveWhiteSet();
+            finish();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }

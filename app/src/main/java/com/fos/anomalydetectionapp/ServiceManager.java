@@ -52,6 +52,7 @@ public class ServiceManager extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
+        // Set notification for ForegroundService
         setNotification();
 
         trafficHistory = new TrafficHistory();
@@ -79,6 +80,7 @@ public class ServiceManager extends Service {
     }
 
     // 오버레이 생성 함수
+    // 오버레이를 통해 터치 이벤트 발생 감지
     public void createOverlay(){
         LayoutInflater inflate = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         wm = (WindowManager) getSystemService(WINDOW_SERVICE);
@@ -94,16 +96,17 @@ public class ServiceManager extends Service {
                         |WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
                 PixelFormat.TRANSLUCENT);
 
+        // 오버레이 위치 설정
         params.gravity = Gravity.LEFT | Gravity.BOTTOM;
 
         mView = inflate.inflate(R.layout.overlay_view, null);
 
-        // 터치가 감지되면 userEventManager 클래스의 마지막 터치 발생 시간 업데이트
+        // 터치가 감지된 경우
         mView.setOnTouchListener(new View.OnTouchListener() {
             @SuppressLint("ClickableViewAccessibility")
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-
+                // 마지막 터치 발생 시간 업데이트
                 userEventManager.addTouchEvent();
 
                 return true;
@@ -114,7 +117,7 @@ public class ServiceManager extends Service {
     }
 
     // Notification 설정
-    // Foreground Service가 실행되면 5초 이내에 notification 정보를 시스템에 보내야함
+    // Foreground Service가 실행되면 5초 이내에 notification 정보를 시스템에 보내야 함
     public void setNotification() {
 
         // Set Notification Channel

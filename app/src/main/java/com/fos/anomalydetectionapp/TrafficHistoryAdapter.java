@@ -70,15 +70,9 @@ public class TrafficHistoryAdapter extends BaseAdapter {
         viewUsage.setText("Usage: " + usage + " bytes");
         viewRisk.setText("Risk Level: " + risk);
 
-
-        if(risk == 1)
-            viewRisk.setTextColor(Color.parseColor("#2ACAEA"));
-        else if(risk == 2)
-            viewRisk.setTextColor(Color.parseColor("#41A541"));
-        else if(risk == 3)
-            viewRisk.setTextColor(Color.parseColor("#ffa500"));
-        else if(risk == 4)
-            viewRisk.setTextColor(Color.parseColor("#ff6666"));
+        // 위험도에 따른 색상 세팅
+        String riskColor[] = {"#666668", "#2ACAEA", "#41A541", "#ffa500", "#ff6666"};
+        viewRisk.setTextColor(Color.parseColor(riskColor[risk]));
 
         return view;
     }
