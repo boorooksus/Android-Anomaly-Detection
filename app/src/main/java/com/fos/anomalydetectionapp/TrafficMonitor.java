@@ -153,6 +153,8 @@ public class TrafficMonitor extends AppCompatActivity {
                                     + ", audio on: " + userEventManager.checkAudioEvent()
                             + ", screen on: " + userEventManager.checkScreenOn());
 
+//                            Log.v("TrafficMonitor", "mic: " + userEventManager.checkMicophone());
+
                         }
                     });
                 }

@@ -3,8 +3,11 @@ package com.fos.anomalydetectionapp;
 import android.app.Activity;
 import android.content.Context;
 import android.media.AudioManager;
+import android.media.MediaRecorder;
 import android.os.PowerManager;
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.io.File;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
@@ -47,6 +50,25 @@ public class UserEventManager extends AppCompatActivity {
         int diff = (int)ChronoUnit.SECONDS.between(lastTouchTime, LocalDateTime.now());
         return diff >= 0 && diff < 20;
     }
+
+//    public boolean checkMicophone(){
+//        MediaRecorder recorder = new MediaRecorder();
+//        recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+//        recorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
+//        recorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
+//        recorder.setOutputFile(new File(activity.getCacheDir(), "MediaUtil#micAvailTestFile").getAbsolutePath());
+//        boolean available = true;
+//        try {
+//            recorder.prepare();
+//            recorder.start();
+//
+//        }
+//        catch (Exception exception) {
+//            available = false;
+//        }
+//        recorder.release();
+//        return available;
+//    }
 
     // 오디오 작동 여부 체크 함수
     public boolean checkAudioEvent(){

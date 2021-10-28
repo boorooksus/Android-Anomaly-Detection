@@ -10,11 +10,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.media.MediaRecorder;
 import android.net.NetworkCapabilities;
 import android.net.Uri;
 import android.os.PowerManager;
 import android.provider.Settings;
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.io.File;
 
 // 앱의 권한 체크 클래스
 public class PermissionChecker extends AppCompatActivity {
