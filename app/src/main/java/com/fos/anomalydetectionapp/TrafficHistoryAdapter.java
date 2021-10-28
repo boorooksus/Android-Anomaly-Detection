@@ -46,7 +46,7 @@ public class TrafficHistoryAdapter extends BaseAdapter {
     @SuppressLint("SetTextI18n")
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        // res/layout/istview_custom.xml 가져옴
+        // res/layout/istview_traffic.xml 가져옴
         @SuppressLint("ViewHolder") View view = layoutInflater.inflate(R.layout.listview_traffic, null);
         TrafficDetail trafficDetail = trafficHistory.getTraffic(position);
 

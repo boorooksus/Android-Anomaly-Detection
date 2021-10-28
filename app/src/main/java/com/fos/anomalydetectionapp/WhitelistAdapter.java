@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
-
 import java.util.Optional;
 
 // 네트워크 히스토리 리스트뷰 어댑터
@@ -32,7 +31,6 @@ public class WhitelistAdapter extends BaseAdapter {
         return whitelistManager.getLength();
     }
 
-    // 수정 필요
     @Override
     public AppDetail getItem(int position) {
         return whitelistManager.getAppDetail(position);
@@ -47,9 +45,8 @@ public class WhitelistAdapter extends BaseAdapter {
     @SuppressLint("SetTextI18n")
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        // res/layout/istview_custom.xml 가져옴
+        // res/layout/.listview_whitelist.xml 가져옴
         @SuppressLint("ViewHolder") View view = layoutInflater.inflate(R.layout.listview_whitelist, null);
-//        TrafficDetail trafficDetail = trafficHistory.getTraffic(position);
         AppDetail appDetail = whitelistManager.getAppDetail(position);
 
         String appName = Optional.ofNullable(appDetail.getAppLabel()).orElse("untitled");
@@ -62,16 +59,17 @@ public class WhitelistAdapter extends BaseAdapter {
         TextView viewUid = view.findViewById(R.id.appUid);
         ImageButton button = view.findViewById(R.id.buttonAddWhitelist);
 
+        // 리스트뷰에 값 세팅
         viewName.setText(appName);
         viewName.setTypeface(null, Typeface.BOLD);
         viewProcessName.setText(appProcessName);
         viewUid.setText("uid: " + uid);
 
+        // 화이트리스트에 등록된 앱은 버튼 표시 변경
         if(isInWhitelist)
             button.setImageResource(R.drawable.check);
 
-//        button.setText(isInWhitelist + "");
-
+        // 버튼 누르면 앱을 화이트리스트에 추가 또는 해제
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -86,9 +84,6 @@ public class WhitelistAdapter extends BaseAdapter {
                     button.setImageResource(R.drawable.plus);
             }
         });
-
         return view;
     }
-
-
 }
