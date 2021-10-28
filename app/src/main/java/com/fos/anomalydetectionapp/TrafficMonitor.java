@@ -1,12 +1,15 @@
 package com.fos.anomalydetectionapp;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.usage.NetworkStats;
 import android.app.usage.NetworkStatsManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.net.NetworkCapabilities;
+import android.net.TrafficStats;
 import android.os.RemoteException;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.ListView;
 
@@ -30,7 +33,7 @@ public class TrafficMonitor extends AppCompatActivity {
     private static LogFileProcessor logFileProcessor;  // 로그 파일 쓰기 위한 객체
     TrafficHistoryAdapter trafficHistoryAdapter;  // 히스토리 리스트뷰 어댑터
     UserEventManager userEventManager;
-    private Timer timer;
+    private static Timer timer;
     ListView listViewHistory;
     WhitelistManager whitelistManager;
 
@@ -49,10 +52,6 @@ public class TrafficMonitor extends AppCompatActivity {
         whitelistManager = new WhitelistManager();
         userEventManager = new UserEventManager(activity, whitelistManager);
         listViewHistory = activity.findViewById(R.id.listViewHistory);
-
-
-        // 앱 정보들을 얻기 위한 패키지 매니저
-        PackageManager pm = activity.getPackageManager();
         networkStatsManager =
                 (NetworkStatsManager) activity.getApplicationContext().
                         getSystemService(Context.NETWORK_STATS_SERVICE);
@@ -66,9 +65,25 @@ public class TrafficMonitor extends AppCompatActivity {
             Log.v("TrafficMonitor", "Checking - " + LocalDateTime.now().toString());
 
 
+//                NetworkStats.Bucket temp2 =
+//                        networkStatsManager.querySummaryForDevice(NetworkCapabilities.TRANSPORT_WIFI,
+//                                "",
+//                                System.currentTimeMillis() - 20000,
+//                                System.currentTimeMillis());
+//
+//                Log.v("============= querySummaryForDevice", temp2.getUid() + "");
+//                Log.v("============= querySummaryForDevice", temp2.getTxBytes() + "");
+//            NetworkStatsManager nsm  =(NetworkStatsManager)activity.getSystemService(Context.NETWORK_STATS_SERVICE);
+//            String subscriberId  = TelephonyManager.EXTRA_SUBSCRIPTION_ID;
+//            long temp = TrafficStats.getMobileTxBytes();
+
+//            TelephonyManager tm = (TelephonyManager) activity.getSystemService(Context.TELEPHONY_SERVICE);
+//            @SuppressLint("HardwareIds") String subscriberId = tm.getSubscriberId();
+//            String imei = tm.getImei();
+
             // 와이파이를 이용한 앱들의 목록과 사용량 구하기
             NetworkStats networkStats =
-                    networkStatsManager.querySummary(NetworkCapabilities.TRANSPORT_WIFI,
+                    networkStatsManager.querySummary(0,
                             "",
                             System.currentTimeMillis() - 20000,
                             System.currentTimeMillis());
@@ -83,6 +98,10 @@ public class TrafficMonitor extends AppCompatActivity {
                 final String processName = (index != -1 ? whitelistManager.getAppDetail(index).getAppProcessName() : "untitled");
                 final long usage = bucket.getTxBytes();  // 현재까지 보낸 트래픽 총량
                 final long diff = usage - Optional.ofNullable(lastUsage.get(processName)).orElse((long) 0);  // 증가한 트래픽 양
+
+                Log.v("===================network info: ", processName);
+                Log.v("===================network info: ", uid + "");
+                Log.v("===================network info: ", usage + "");
 
                 if(uid == 0 || uid == 1000) continue;
 
