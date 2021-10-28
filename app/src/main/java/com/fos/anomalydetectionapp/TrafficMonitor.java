@@ -83,7 +83,7 @@ public class TrafficMonitor extends AppCompatActivity {
 
             // 와이파이를 이용한 앱들의 목록과 사용량 구하기
             NetworkStats networkStats =
-                    networkStatsManager.querySummary(0,
+                    networkStatsManager.querySummary(NetworkCapabilities.TRANSPORT_WIFI,
                             "",
                             System.currentTimeMillis() - 20000,
                             System.currentTimeMillis());
@@ -99,9 +99,9 @@ public class TrafficMonitor extends AppCompatActivity {
                 final long usage = bucket.getTxBytes();  // 현재까지 보낸 트래픽 총량
                 final long diff = usage - Optional.ofNullable(lastUsage.get(processName)).orElse((long) 0);  // 증가한 트래픽 양
 
-                Log.v("===================network info: ", processName);
-                Log.v("===================network info: ", uid + "");
-                Log.v("===================network info: ", usage + "");
+//                Log.v("===================network info: ", processName);
+//                Log.v("===================network info: ", uid + "");
+//                Log.v("===================network info: ", usage + "");
 
                 if(uid == 0 || uid == 1000) continue;
 
