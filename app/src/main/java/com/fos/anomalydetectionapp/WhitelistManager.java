@@ -95,8 +95,7 @@ public class WhitelistManager extends AppCompatActivity {
                 isSafe = true;
 
             // 사용자의 화이트리스트 세팅한적이 없고 안드로이드 기본 앱인 경우
-            else if (!isInitialized && (processName.contains("com.android") || processName.contains("com.google")
-                    || processName.contains("com.lge") || processName.contains("android.process"))) {
+            else if (!isInitialized && checkDefaultWhitelist(processName)) {
                 isSafe = true;
                 whiteSet.add(processName);
             }
@@ -106,6 +105,12 @@ public class WhitelistManager extends AppCompatActivity {
             appIndex.put(uid, i);
             i++;
         }
+    }
+
+    public boolean checkDefaultWhitelist(String processName){
+        return processName.contains("com.android") || processName.contains("com.google")
+                || processName.contains("com.lge") || processName.contains("android.process")
+                || processName.contains("com.samsung");
     }
 
     // 앱의 화이트리스트 등록 여부 변경 함수

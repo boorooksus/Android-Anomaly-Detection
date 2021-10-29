@@ -163,7 +163,7 @@ public class ServiceManager extends Service {
                 currentApp = Objects.requireNonNull(mySortedMap.get(mySortedMap.lastKey())).getPackageName();
             }
         }
-        Log.e(TAG, "Current Foreground App: " + currentApp);
+//        Log.e(TAG, "Current Foreground App: " + currentApp);
 
         return currentApp;
 
