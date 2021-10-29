@@ -125,7 +125,7 @@ public class TrafficMonitor extends AppCompatActivity {
                 if(uid == 0 || uid == 1000) continue;
 
                 if(diff <= 0) continue;
-                final int risk = userEventManager.getRisk(uid);
+                final int risk = userEventManager.getRisk(uid, processName);
 
                 // 현재 함수가 lastUsage 컬렉션 초기화를 위해 실행중인 경우에는 히스토리 목록에 넣지 않는다
                 if(isInitialized){
@@ -149,7 +149,7 @@ public class TrafficMonitor extends AppCompatActivity {
 
                             Log.v("TrafficMonitor", log);
                             Log.v("TrafficMonitor", "whitelist: " + userEventManager.checkWhitelist(uid)
-                             + ", touch event: " + userEventManager.checkTouchEvent()
+                             + ", touch event: " + userEventManager.checkTouchEvent(processName)
                                     + ", audio on: " + userEventManager.checkAudioEvent()
                             + ", screen on: " + userEventManager.checkScreenOn());
 

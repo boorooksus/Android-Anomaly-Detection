@@ -1,18 +1,29 @@
 package com.fos.anomalydetectionapp;
 
+import static android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND;
+import static android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE;
+import static android.content.ContentValues.TAG;
 import static android.view.WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+
+import static java.lang.Thread.sleep;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.KeyguardManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
+import android.app.usage.UsageStats;
+import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.IBinder;
+import android.provider.SyncStateContract;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -21,6 +32,13 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 
 // 백그라운드 실행을 위한 서비스 관리 클래스
@@ -106,14 +124,49 @@ public class ServiceManager extends Service {
             @SuppressLint("ClickableViewAccessibility")
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                // 마지막 터치 발생 시간 업데이트
-                userEventManager.addTouchEvent();
+                // 터치 발생 시간 업데이트
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        userEventManager.addTouchEvent(getForegroundApp(), LocalDateTime.now());
+                    }
+                }).start();
 
                 return true;
             }
         });
 
         wm.addView(mView, params);
+    }
+
+    public String getForegroundApp(){
+
+        try {
+            sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
+        String currentApp = null;
+        UsageStatsManager usm = (UsageStatsManager) this.getSystemService(Context.USAGE_STATS_SERVICE);
+        long time = System.currentTimeMillis();
+
+        List<UsageStats> applist = usm.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, time - 1000 * 1000, time);
+        if (applist != null && applist.size() > 0) {
+            SortedMap<Long, UsageStats> mySortedMap = new TreeMap<>();
+            for (UsageStats usageStats : applist) {
+                mySortedMap.put(usageStats.getLastTimeUsed(), usageStats);
+            }
+            if (!mySortedMap.isEmpty()) {
+                currentApp = Objects.requireNonNull(mySortedMap.get(mySortedMap.lastKey())).getPackageName();
+            }
+        }
+        Log.e(TAG, "Current Foreground App: " + currentApp);
+
+        return currentApp;
+
     }
 
     // Notification 설정
