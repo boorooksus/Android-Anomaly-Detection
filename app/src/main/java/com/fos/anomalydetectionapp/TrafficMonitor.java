@@ -150,7 +150,8 @@ public class TrafficMonitor extends AppCompatActivity {
                             Log.e("Traffic Log: ", log);
                             Log.e("App info: ", "whitelist: " + userEventManager.checkWhitelist(uid)
                              + ", touch event: " + userEventManager.checkTouchEvent(processName)
-                                    + ", audio on: " + userEventManager.checkAudioEvent()
+//                                    + ", audio on: " + userEventManager.checkAudioEvent()
+//                                    + ", audio on: " + userEventManager.checkAudioEvent()
                             + ", screen on: " + userEventManager.checkScreenOn());
 
 //                            Log.v("TrafficMonitor", "mic: " + userEventManager.checkMicophone());

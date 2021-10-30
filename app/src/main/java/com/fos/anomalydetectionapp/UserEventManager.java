@@ -33,10 +33,15 @@ public class UserEventManager extends AppCompatActivity {
     // 위험도 측정
     public int getRisk(Integer uid, String processName){
         if (checkWhitelist(uid)) return 0;
-        else if (checkTouchEvent(processName)) return 1;
-        else if (checkAudioEvent()) return 2;
-        else if (checkScreenOn()) return 3;
-        else return 4;
+
+        if (checkScreenOn()){
+            if(checkTouchEvent(processName)) return 1;
+            else return 2;
+        }
+        else {
+            if(checkTouchEvent(processName)) return 4;
+            else return 3;
+        }
     }
 
     // 앱의 화이트리스트 등록 여부 체크 함수
@@ -72,11 +77,11 @@ public class UserEventManager extends AppCompatActivity {
 //        return available;
 //    }
 
-    // 오디오 작동 여부 체크 함수
-    public boolean checkAudioEvent(){
-        AudioManager manager = (AudioManager)activity.getSystemService(AUDIO_SERVICE);
-        return manager.isMusicActive();
-    }
+//    // 오디오 작동 여부 체크 함수
+//    public boolean checkAudioEvent(){
+//        AudioManager manager = (AudioManager)activity.getSystemService(AUDIO_SERVICE);
+//        return manager.isMusicActive();
+//    }
 
     // 스크린 켜짐 여부 체크 함수
     public boolean checkScreenOn(){
