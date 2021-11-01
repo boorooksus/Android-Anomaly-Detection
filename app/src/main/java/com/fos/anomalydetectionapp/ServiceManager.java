@@ -34,6 +34,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -129,7 +130,10 @@ public class ServiceManager extends Service {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        userEventManager.addTouchEvent(getForegroundApp(), LocalDateTime.now());
+                        userEventManager.addTouchEvent(getForegroundApp(), LocalDateTime.now().minusSeconds(2));
+//                        Log.e("app name", getForegroundApp());
+//                        Log.e("current time:", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH시 mm분 ss초")));
+//                        Log.e("touch time:", LocalDateTime.now().minusSeconds(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH시 mm분 ss초")));
                     }
                 }).start();
 

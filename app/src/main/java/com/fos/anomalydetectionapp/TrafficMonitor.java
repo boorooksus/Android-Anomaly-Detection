@@ -14,7 +14,10 @@ import android.util.Log;
 import android.widget.ListView;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
@@ -118,6 +121,8 @@ public class TrafficMonitor extends AppCompatActivity {
                 final long usage = bucket.getTxBytes();  // 현재까지 보낸 트래픽 총량
                 final long diff = usage - Optional.ofNullable(lastUsage.get(processName)).orElse((long) 0);  // 증가한 트래픽 양
 
+                final LocalDateTime time = Instant.ofEpochMilli(bucket.getStartTimeStamp()).atZone(ZoneId.systemDefault()).toLocalDateTime();
+
 //                Log.v("===================network info: ", processName);
 //                Log.v("===================network info: ", uid + "");
 //                Log.v("===================network info: ", usage + "");
@@ -135,7 +140,8 @@ public class TrafficMonitor extends AppCompatActivity {
                         public void run() {
                             // 히스토리 인스턴스 생성 후 히스토리 목록에 추가
 
-                            TrafficDetail trafficDetail = new TrafficDetail(LocalDateTime.now(), appLabel, processName, uid, usage, risk);
+//                            TrafficDetail trafficDetail = new TrafficDetail(LocalDateTime.now(), appLabel, processName, uid, usage, risk);
+                            TrafficDetail trafficDetail = new TrafficDetail(time, appLabel, processName, uid, usage, risk);
                             trafficHistory.addTraffic(trafficDetail);
 
                             listViewHistory.setAdapter(trafficHistoryAdapter);
@@ -143,7 +149,8 @@ public class TrafficMonitor extends AppCompatActivity {
                             // 로그 파일에 저장
                             logFileProcessor.writeLog(activity, trafficDetail);
 
-                            String log = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+//                            String log = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                            String log = time + "";
 
                             log += "," + uid + "," + usage + "," + risk + "," + appLabel + "," + processName;
 
