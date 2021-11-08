@@ -41,7 +41,7 @@ public class WhitelistAdapter extends BaseAdapter {
         return position;
     }
 
-    // 리스트뷰의 히스토리 출력 방식 설정
+    // 리스트뷰의 출력 방식 설정
     @SuppressLint("SetTextI18n")
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -73,15 +73,9 @@ public class WhitelistAdapter extends BaseAdapter {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 isInWhitelist = !appDetail.getIsInWhitelist();
-
                 whitelistManager.setAppDetail(position, isInWhitelist);
-
-                if(isInWhitelist)
-                    button.setImageResource(R.drawable.check);
-                else
-                    button.setImageResource(R.drawable.plus);
+                button.setImageResource(isInWhitelist?R.drawable.check:R.drawable.plus);
             }
         });
         return view;

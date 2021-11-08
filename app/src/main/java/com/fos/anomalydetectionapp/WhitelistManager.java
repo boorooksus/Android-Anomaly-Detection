@@ -47,15 +47,15 @@ public class WhitelistManager extends AppCompatActivity {
             isInitialized = true;
         }
 
-        HashSet<Integer> appSet = new HashSet<>();
-        appDetails = new ArrayList<>();
-        appIndex = new HashMap<>();
-        PackageManager pm = activity.getPackageManager();
+        HashSet<Integer> appSet = new HashSet<>();  // 네트워크 사용 앱 이름 set
+        appDetails = new ArrayList<>();  // 네트워크 사용 앱 정보 배열
+        appIndex = new HashMap<>();  // 앱 정보 배열에 저장된 인덱스 번호 맵
+        PackageManager packageManager = activity.getPackageManager();
         NetworkStatsManager networkStatsManager = (NetworkStatsManager) activity.getApplicationContext().
                 getSystemService(Context.NETWORK_STATS_SERVICE);
 
+        // 디바이스에 설치된 앱들 중에서 네트워크 사용 이력이 있는 앱들 정보 가져오기
         try {
-            // 네트워크 사용 이력이 있는 앱들 정보 가져오기
             NetworkStats networkStats =
                     networkStatsManager.querySummary(NetworkCapabilities.TRANSPORT_WIFI,
                             "",
@@ -67,6 +67,7 @@ public class WhitelistManager extends AppCompatActivity {
 
                 int uid = bucket.getUid();
 
+                // 시스템 어플은 저장하지 않고 넘김
                 if (uid == 0 || uid == 1000) continue;
 
                 appSet.add(uid);
@@ -76,12 +77,11 @@ public class WhitelistManager extends AppCompatActivity {
             e.printStackTrace();
         }
 
-
-        // 디바이스에 설치된 앱들 정보 가져오기
-        @SuppressLint("QueryPermissionsNeeded") List<ApplicationInfo> apps = pm.getInstalledApplications(0);
+        // 디바이스에 설치된 앱들 정보 중에서 네트워크 사용 이력 있는 앱들만 저장
+        @SuppressLint("QueryPermissionsNeeded") List<ApplicationInfo> apps = packageManager.getInstalledApplications(0);
         int i = 0;
         for (ApplicationInfo app : apps) {
-            String appName = app.loadLabel(pm).toString();
+            String appName = app.loadLabel(packageManager).toString();
             String processName = app.processName;
             int uid = app.uid;
 
@@ -107,7 +107,9 @@ public class WhitelistManager extends AppCompatActivity {
         }
     }
 
+    // 앱 처음 실행 시 기본적으로 화이트리스트에 등록하는 기준
     public boolean checkDefaultWhitelist(String processName){
+        // 구글, 안드로이드, lg, 삼성 기본 어플인 경우 화이트리스트에 등록
         return processName.contains("com.android") || processName.contains("com.google")
                 || processName.contains("com.lge") || processName.contains("android.process")
                 || processName.contains("com.samsung");
@@ -115,16 +117,14 @@ public class WhitelistManager extends AppCompatActivity {
 
     // 앱의 화이트리스트 등록 여부 변경 함수
     public void setAppDetail(int position, boolean isSafe){
-        AppDetail temp = appDetails.get(position);
-        temp.setInWhitelist(isSafe);
-        appDetails.set(position, temp);
+        AppDetail appDetail = appDetails.get(position);
+        appDetail.setInWhitelist(isSafe);
+        appDetails.set(position, appDetail);
 
         if (isSafe)
-            whiteSet.add(temp.getAppProcessName());
+            whiteSet.add(appDetail.getAppProcessName());
         else
-            whiteSet.remove(temp.getAppProcessName());
-
-
+            whiteSet.remove(appDetail.getAppProcessName());
     }
 
     // 저장된 히스토리 개수 리턴 함수

@@ -62,7 +62,7 @@ public class TrafficHistoryAdapter extends BaseAdapter {
         TextView viewUsage = view.findViewById(R.id.textViewUsage);  // 트래픽 사용량
         TextView viewRisk = view.findViewById(R.id.textViewRisk); // 위험도
 
-        // 리스트뷰에 히스토리 정보 세팅
+        // 리스트뷰에 트래픽 로그 정보 세팅
         viewTime.setText(time.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         viewName.setText(name);
         viewName.setTypeface(null, Typeface.BOLD);

@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 public class TrafficDetail {
     private final LocalDateTime time;  // 업데이트 시각
     private final String appLabel;  // 앱 레이블(기본 이름)
-    private final String appProcessName;  // 앱 이름(상세 이름)
+    private final String appProcessName;  // 앱 프로세스 이름(패키지 네임)
     private final int uid;  // uid
     private final long usage;  // 송신 트래픽 발생량
     private final int risk;  // 위험도

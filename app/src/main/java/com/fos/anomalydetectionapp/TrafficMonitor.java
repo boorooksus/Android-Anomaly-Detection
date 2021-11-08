@@ -11,9 +11,7 @@ import android.widget.ListView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +33,7 @@ public class TrafficMonitor extends AppCompatActivity {
     UserEventManager userEventManager;
     private static Timer timer;  // 모니터링 타이머
     WhitelistManager whitelistManager;
-    private long lambda = 20000;
+    private long lambda = 20000;  // 트래픽 탐지 시간 범위
 
 
     // Constructor
@@ -89,24 +87,10 @@ public class TrafficMonitor extends AppCompatActivity {
     public void detectTraffic(){
 
         try {
-            Log.v("TrafficMonitor", "Checking - " + LocalDateTime.now().toString());
 
+            LocalDateTime time = LocalDateTime.now();  // 현재 탐지 시간
 
-//                NetworkStats.Bucket temp2 =
-//                        networkStatsManager.querySummaryForDevice(NetworkCapabilities.TRANSPORT_WIFI,
-//                                "",
-//                                System.currentTimeMillis() - 20000,
-//                                System.currentTimeMillis());
-//
-//                Log.v("============= querySummaryForDevice", temp2.getUid() + "");
-//                Log.v("============= querySummaryForDevice", temp2.getTxBytes() + "");
-//            NetworkStatsManager nsm  =(NetworkStatsManager)activity.getSystemService(Context.NETWORK_STATS_SERVICE);
-//            String subscriberId  = TelephonyManager.EXTRA_SUBSCRIPTION_ID;
-//            long temp = TrafficStats.getMobileTxBytes();
-
-//            TelephonyManager tm = (TelephonyManager) activity.getSystemService(Context.TELEPHONY_SERVICE);
-//            @SuppressLint("HardwareIds") String subscriberId = tm.getSubscriberId();
-//            String imei = tm.getImei();
+            Log.v("TrafficMonitor", "Checking - " + time.toString());
 
             // 와이파이를 이용한 앱들의 목록과 사용량 구하기
             NetworkStats networkStats =
@@ -118,27 +102,21 @@ public class TrafficMonitor extends AppCompatActivity {
                 NetworkStats.Bucket bucket = new NetworkStats.Bucket();
                 networkStats.getNextBucket(bucket);
 
-                final int uid = bucket.getUid();  // 앱 uid
                 // 앱 정보 얻기
+                final int uid = bucket.getUid();  // 앱 uid
                 int index = whitelistManager.getIndex(uid);
-                final String appLabel = (index != -1 ? whitelistManager.getAppDetail(index).getAppLabel() : "untitled");
                 final String processName = (index != -1 ? whitelistManager.getAppDetail(index).getAppProcessName() : "untitled");
                 final long usage = bucket.getTxBytes();  // 현재까지 보낸 트래픽 총량
                 final long diff = usage - Optional.ofNullable(lastUsage.get(processName)).orElse((long) 0);  // 증가한 트래픽 양
 
-//                final LocalDateTime time = Instant.ofEpochMilli(bucket.getStartTimeStamp()).atZone(ZoneId.systemDefault()).toLocalDateTime();
-                final LocalDateTime time = LocalDateTime.now();
-
-//                Log.e("start time stamp: ", Instant.ofEpochMilli(bucket.getStartTimeStamp()).atZone(ZoneId.systemDefault()).toLocalDateTime() + "");
-//                Log.e("start end stamp: ", Instant.ofEpochMilli(bucket.getEndTimeStamp()).atZone(ZoneId.systemDefault()).toLocalDateTime() + "");
-
-//                Log.v("===================network info: ", processName);
-//                Log.v("===================network info: ", uid + "");
-//                Log.v("===================network info: ", usage + "");
-
+                // 시스템 기본 앱은 넘김
                 if(uid == 0 || uid == 1000) continue;
 
+                // 중복되는 내역은 넘김
                 if(diff <= 0) continue;
+
+                // 앱 추가 정보 얻기
+                final String appLabel = (index != -1 ? whitelistManager.getAppDetail(index).getAppLabel() : "untitled");
                 final int risk = userEventManager.accessRisk(uid, processName);
 
                 // 현재 함수가 lastUsage 컬렉션 초기화를 위해 실행중인 경우에는 히스토리 목록에 넣지 않는다
@@ -149,7 +127,6 @@ public class TrafficMonitor extends AppCompatActivity {
                         public void run() {
                             // 히스토리 인스턴스 생성 후 히스토리 목록에 추가
 
-//                            TrafficDetail trafficDetail = new TrafficDetail(LocalDateTime.now(), appLabel, processName, uid, usage, risk);
                             TrafficDetail trafficDetail = new TrafficDetail(time, appLabel, processName, uid, usage, risk);
                             trafficHistory.addTraffic(trafficDetail);
 
@@ -158,24 +135,13 @@ public class TrafficMonitor extends AppCompatActivity {
                             // 로그 파일에 저장
                             logFileProcessor.writeLog(activity, trafficDetail);
 
-//                            String log = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-                            String log = time + "";
-
+                            // 콘솔 로그 출력
+                            String log = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
                             log += "," + uid + "," + usage + "," + risk + "," + appLabel + "," + processName;
-
                             Log.e("Traffic Log: ", log);
                             Log.e("App info: ", "whitelist: " + userEventManager.checkWhitelist(uid)
                              + ", touch event: " + userEventManager.checkTouchEvent(processName)
-//                                    + ", audio on: " + userEventManager.checkAudioEvent()
-//                                    + ", audio on: " + userEventManager.checkAudioEvent()
                             + ", screen on: " + userEventManager.checkScreenOn());
-
-                            Log.e("cur time: ", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + "");
-                            Log.e("start time: ", Instant.ofEpochMilli(bucket.getStartTimeStamp()).atZone(ZoneId.systemDefault()).toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + "");
-                            Log.e("end time: ", Instant.ofEpochMilli(bucket.getEndTimeStamp()).atZone(ZoneId.systemDefault()).toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + "");
-
-//                            Log.v("TrafficMonitor", "mic: " + userEventManager.checkMicophone());
-
                         }
                     });
                 }

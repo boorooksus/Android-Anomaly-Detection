@@ -25,11 +25,6 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 
 // 백그라운드 실행을 위한 서비스 관리 클래스
@@ -127,34 +122,6 @@ public class ServiceManager extends Service {
         // 오버레이 생성
         windowManager.addView(overlayView, params);
     }
-
-//    public String getForegroundApp(){
-//
-//        try {
-//            sleep(1000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//
-//
-//        String currentApp = null;
-//        UsageStatsManager usm = (UsageStatsManager) this.getSystemService(Context.USAGE_STATS_SERVICE);
-//        long time = System.currentTimeMillis();
-//
-//        List<UsageStats> applist = usm.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, time - 1000 * 1000, time);
-//        if (applist != null && applist.size() > 0) {
-//            SortedMap<Long, UsageStats> mySortedMap = new TreeMap<>();
-//            for (UsageStats usageStats : applist) {
-//                mySortedMap.put(usageStats.getLastTimeUsed(), usageStats);
-//            }
-//            if (!mySortedMap.isEmpty()) {
-//                currentApp = Objects.requireNonNull(mySortedMap.get(mySortedMap.lastKey())).getPackageName();
-//            }
-//        }
-//
-//        return currentApp;
-//
-//    }
 
     // Notification 설정
     // Foreground Service가 실행되면 5초 이내에 notification 정보를 시스템에 보내야 함

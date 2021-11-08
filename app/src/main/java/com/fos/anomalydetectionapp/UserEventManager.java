@@ -7,7 +7,6 @@ import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.os.PowerManager;
-import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -37,11 +36,11 @@ public class UserEventManager extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                // 현재 시간, 터치 발생 포어그라운드 앱 업데이트
                 LocalDateTime time = LocalDateTime.now();
                 String processName = getForegroundApp();
                 lastTouchTime.put(processName, time);
-
-                Log.e("Touch event: ", processName + time);
+//                Log.e("Touch event: ", processName + time);
             }
         }).start();
 
@@ -51,7 +50,7 @@ public class UserEventManager extends AppCompatActivity {
     // 포어그라운드 앱 패키지 네임 리턴 함수
     public String getForegroundApp(){
 
-        // 앱 초기화 시작을 고려하여 1초 지연
+        // 앱 초기화 시간을 고려하여 1초 지연
         try {
             sleep(1000);
         } catch (InterruptedException e) {
@@ -80,9 +79,12 @@ public class UserEventManager extends AppCompatActivity {
 
     // 위험도 평가
     public int accessRisk(Integer uid, String processName){
+        // 화이트리스트 여부
         if (checkWhitelist(uid)) return 0;
 
+        // 스크린 온오프 여부
         if (checkScreenOn()){
+            // 터치 이벤트 발생 여부
             if(checkTouchEvent(processName)) return 1;
             else return 2;
         }
@@ -98,6 +100,8 @@ public class UserEventManager extends AppCompatActivity {
 
     // 유저 터치 이벤트 체크 함수
     public boolean checkTouchEvent(String processName){
+        // 앱의 마지막 터치 이벤트 발생 시각이 현재 시각 20초 내에 있으면 true
+
         LocalDateTime time = Optional.ofNullable(lastTouchTime.get(processName))
                 .orElse(LocalDateTime.of(1, 1, 1, 1, 1));
         return (int)ChronoUnit.SECONDS.between(LocalDateTime.now(), time) < 20;

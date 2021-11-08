@@ -10,10 +10,10 @@ import android.widget.ListView;
 // 화이트리스트 관리 액티비티
 public class WhitelistActivity extends AppCompatActivity {
 
-    Toolbar toolbar;
-    ActionBar actionBar;
-    ListView listViewWhitelist;
-    WhitelistAdapter whitelistAdapter;
+    Toolbar toolbar;  // 상단 바
+    ActionBar actionBar;  // 상단 바
+    ListView listViewWhitelist;  // 네트워크 사용 앱들 리스트
+    WhitelistAdapter whitelistAdapter;  // 리스트뷰 어댑터
     WhitelistManager whitelistManager;
 
     @Override
