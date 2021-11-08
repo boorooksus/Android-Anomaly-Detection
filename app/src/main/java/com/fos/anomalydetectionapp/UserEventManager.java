@@ -86,10 +86,7 @@ public class UserEventManager extends AppCompatActivity {
             if(checkTouchEvent(processName)) return 1;
             else return 2;
         }
-        else {
-            if(checkTouchEvent(processName)) return 4;
-            else return 3;
-        }
+        else return 3;
     }
 
     // 앱의 화이트리스트 등록 여부 체크 함수
