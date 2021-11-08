@@ -72,8 +72,6 @@ public class TrafficHistoryAdapter extends BaseAdapter {
 
         // 위험도에 따른 색상 세팅
         String[] riskColor = {"#2ACAEA", "#41A541", "#ffa500", "#ff6666"};
-//        String[] riskColor = {"#666668", "#2ACAEA", "#41A541", "#ffa500", "#ff6666"};
-//        String[] riskColor = {"#666668", "#2ACAEA", "#ffa500", "#ff6666"};
         viewRisk.setTextColor(Color.parseColor(riskColor[risk]));
 
         return view;

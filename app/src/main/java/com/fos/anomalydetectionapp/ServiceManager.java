@@ -72,6 +72,7 @@ public class ServiceManager extends Service {
 
         // start traffic monitoring
         trafficMonitor.startMonitoring();
+
         // create overlay for detecting touch event
         createOverlay();
 
@@ -117,13 +118,7 @@ public class ServiceManager extends Service {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 // 포어그라운드 앱의 터치 발생 시간 업데이트
-
-                userEventManager.addTouchEvent(LocalDateTime.now().minusSeconds(1));
-//                new Thread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                    }
-//                }).start();
+                userEventManager.addTouchEvent();
 
                 return true;
             }

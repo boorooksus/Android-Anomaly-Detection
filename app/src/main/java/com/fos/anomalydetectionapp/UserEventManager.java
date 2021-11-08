@@ -33,10 +33,11 @@ public class UserEventManager extends AppCompatActivity {
     }
 
     // 포어그라운드 앱 터치 이벤트 기록
-    public void addTouchEvent(LocalDateTime time){
+    public void addTouchEvent(){
         new Thread(new Runnable() {
             @Override
             public void run() {
+                LocalDateTime time = LocalDateTime.now();
                 String processName = getForegroundApp();
                 lastTouchTime.put(processName, time);
 
