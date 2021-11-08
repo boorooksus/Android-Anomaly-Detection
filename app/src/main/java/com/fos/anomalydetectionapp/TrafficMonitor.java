@@ -1,15 +1,11 @@
 package com.fos.anomalydetectionapp;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.usage.NetworkStats;
 import android.app.usage.NetworkStatsManager;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.net.NetworkCapabilities;
-import android.net.TrafficStats;
 import android.os.RemoteException;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.ListView;
 
@@ -39,6 +35,7 @@ public class TrafficMonitor extends AppCompatActivity {
     UserEventManager userEventManager;
     private static Timer timer;  // 모니터링 타이머
     WhitelistManager whitelistManager;
+    private long lambda = 20000;
 
 
     // Constructor
@@ -71,8 +68,16 @@ public class TrafficMonitor extends AppCompatActivity {
             }
         };
 
-        // 타이머 주기를 20초로 설정하고 작동
-        timer.schedule(timerTask, 0, 20000);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                // 타이머 주기를 20초로 설정하고 작동
+                timer.schedule(timerTask, 0, lambda);
+
+            }
+        }).start();
     }
 
     // 모니터링 정지 함수
@@ -107,7 +112,7 @@ public class TrafficMonitor extends AppCompatActivity {
             NetworkStats networkStats =
                     networkStatsManager.querySummary(NetworkCapabilities.TRANSPORT_WIFI,
                             "",
-                            System.currentTimeMillis() - 20000,
+                            System.currentTimeMillis() - lambda,
                             System.currentTimeMillis());
             do {
                 NetworkStats.Bucket bucket = new NetworkStats.Bucket();
@@ -121,7 +126,11 @@ public class TrafficMonitor extends AppCompatActivity {
                 final long usage = bucket.getTxBytes();  // 현재까지 보낸 트래픽 총량
                 final long diff = usage - Optional.ofNullable(lastUsage.get(processName)).orElse((long) 0);  // 증가한 트래픽 양
 
-                final LocalDateTime time = Instant.ofEpochMilli(bucket.getStartTimeStamp()).atZone(ZoneId.systemDefault()).toLocalDateTime();
+//                final LocalDateTime time = Instant.ofEpochMilli(bucket.getStartTimeStamp()).atZone(ZoneId.systemDefault()).toLocalDateTime();
+                final LocalDateTime time = LocalDateTime.now();
+
+//                Log.e("start time stamp: ", Instant.ofEpochMilli(bucket.getStartTimeStamp()).atZone(ZoneId.systemDefault()).toLocalDateTime() + "");
+//                Log.e("start end stamp: ", Instant.ofEpochMilli(bucket.getEndTimeStamp()).atZone(ZoneId.systemDefault()).toLocalDateTime() + "");
 
 //                Log.v("===================network info: ", processName);
 //                Log.v("===================network info: ", uid + "");
@@ -130,7 +139,7 @@ public class TrafficMonitor extends AppCompatActivity {
                 if(uid == 0 || uid == 1000) continue;
 
                 if(diff <= 0) continue;
-                final int risk = userEventManager.getRisk(uid, processName);
+                final int risk = userEventManager.accessRisk(uid, processName);
 
                 // 현재 함수가 lastUsage 컬렉션 초기화를 위해 실행중인 경우에는 히스토리 목록에 넣지 않는다
                 if(isInitialized){
@@ -160,6 +169,10 @@ public class TrafficMonitor extends AppCompatActivity {
 //                                    + ", audio on: " + userEventManager.checkAudioEvent()
 //                                    + ", audio on: " + userEventManager.checkAudioEvent()
                             + ", screen on: " + userEventManager.checkScreenOn());
+
+                            Log.e("cur time: ", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + "");
+                            Log.e("start time: ", Instant.ofEpochMilli(bucket.getStartTimeStamp()).atZone(ZoneId.systemDefault()).toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + "");
+                            Log.e("end time: ", Instant.ofEpochMilli(bucket.getEndTimeStamp()).atZone(ZoneId.systemDefault()).toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + "");
 
 //                            Log.v("TrafficMonitor", "mic: " + userEventManager.checkMicophone());
 

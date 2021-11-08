@@ -3,21 +3,18 @@ package com.fos.anomalydetectionapp;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.AppOpsManager;
 import android.app.usage.NetworkStats;
 import android.app.usage.NetworkStatsManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.media.MediaRecorder;
 import android.net.NetworkCapabilities;
 import android.net.Uri;
 import android.os.PowerManager;
 import android.provider.Settings;
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.io.File;
 
 // 앱의 권한 체크 클래스
 public class PermissionChecker extends AppCompatActivity {
@@ -70,7 +67,6 @@ public class PermissionChecker extends AppCompatActivity {
     }
 
     // 스토리지 접근 권한 및 앱의 사용 기록 액세스 권한 체크 함수
-    // 권한 있는 경우 true, 없는 경우 유저를 설정 앱으로 보내고 false 리턴
     public boolean checkAccessPermission(){
 
         NetworkStatsManager networkStatsManager =
@@ -114,6 +110,7 @@ public class PermissionChecker extends AppCompatActivity {
                 builder.setMessage(msg);
 
                 // 알림의 확인 버튼 기능 생성
+                // 'Negative Button'이지만 확인 버튼으로 설정
                 builder.setNegativeButton(
                         "OK",
                         new DialogInterface.OnClickListener() {

@@ -1,8 +1,6 @@
 package com.fos.anomalydetectionapp;
 
 import android.app.Activity;
-import android.util.Log;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -47,15 +45,15 @@ public class LogFileProcessor {
             BufferedWriter bw = new BufferedWriter( fw );
 
             LocalDateTime time = trafficDetail.getTime();  // 업데이트 시각
-            String name = trafficDetail.getAppLabel();
-            String processName = trafficDetail.getAppProcessName();  // 앱 이름
+            String name = trafficDetail.getAppLabel();  // 앱 이름
+            String processName = trafficDetail.getAppProcessName();  // 앱 패키지 네임
             int uid = trafficDetail.getUid();  // 앱 uid
             long usage = trafficDetail.getUsage();  // 앱 사용량
-            int risk = trafficDetail.getRisk();
+            int risk = trafficDetail.getRisk();  // 위험도
 
+            // 파일 형식에 맞게 정보 저장
             String log = time.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
             log += "," + uid + "," + usage + "," + risk + "," + name + "," + processName;
-
 
             bw.write(log);
             bw.newLine();

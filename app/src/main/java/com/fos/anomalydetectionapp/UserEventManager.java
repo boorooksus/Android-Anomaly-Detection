@@ -1,17 +1,24 @@
 package com.fos.anomalydetectionapp;
 
+import static java.lang.Thread.sleep;
+
 import android.app.Activity;
+import android.app.usage.UsageStats;
+import android.app.usage.UsageStatsManager;
 import android.content.Context;
-import android.media.AudioManager;
-import android.media.MediaRecorder;
 import android.os.PowerManager;
+import android.util.Log;
+
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.io.File;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 // 유저 이벤트 감지 클래스
 public class UserEventManager extends AppCompatActivity {
@@ -25,13 +32,53 @@ public class UserEventManager extends AppCompatActivity {
         this.whitelistManager = whitelistManager;
     }
 
-    // 터치 이벤트 추가
-    public void addTouchEvent(String processName, LocalDateTime time){
-        lastTouchTime.put(processName, time);
+    // 포어그라운드 앱 터치 이벤트 기록
+    public void addTouchEvent(LocalDateTime time){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String processName = getForegroundApp();
+                lastTouchTime.put(processName, time);
+
+                Log.e("Touch event: ", processName + time);
+            }
+        }).start();
+
+
     }
 
-    // 위험도 측정
-    public int getRisk(Integer uid, String processName){
+    // 포어그라운드 앱 패키지 네임 리턴 함수
+    public String getForegroundApp(){
+
+        // 앱 초기화 시작을 고려하여 1초 지연
+        try {
+            sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        // 현재 포어그라운드 앱 얻기
+        UsageStatsManager usm = (UsageStatsManager) activity.getSystemService(Context.USAGE_STATS_SERVICE);
+        String curApp = null;  // 포어그라운드 앱 패키지 네임
+        long curTime = System.currentTimeMillis();
+        List<UsageStats> applist = usm.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, curTime - 1000 * 1000, curTime);
+
+        if (applist != null && applist.size() > 0) {
+            SortedMap<Long, UsageStats> mySortedMap = new TreeMap<>();
+            for (UsageStats usageStats : applist) {
+                mySortedMap.put(usageStats.getLastTimeUsed(), usageStats);
+            }
+            if (!mySortedMap.isEmpty()) {
+                curApp = Objects.requireNonNull(mySortedMap.get(mySortedMap.lastKey())).getPackageName();
+            }
+        }
+
+        return curApp;
+
+    }
+
+    // 위험도 평가
+    public int accessRisk(Integer uid, String processName){
         if (checkWhitelist(uid)) return 0;
 
         if (checkScreenOn()){
@@ -57,31 +104,6 @@ public class UserEventManager extends AppCompatActivity {
                 .orElse(LocalDateTime.of(1, 1, 1, 1, 1));
         return (int)ChronoUnit.SECONDS.between(LocalDateTime.now(), time) < 20;
     }
-
-//    public boolean checkMicophone(){
-//        MediaRecorder recorder = new MediaRecorder();
-//        recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-//        recorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
-//        recorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
-//        recorder.setOutputFile(new File(activity.getCacheDir(), "MediaUtil#micAvailTestFile").getAbsolutePath());
-//        boolean available = true;
-//        try {
-//            recorder.prepare();
-//            recorder.start();
-//
-//        }
-//        catch (Exception exception) {
-//            available = false;
-//        }
-//        recorder.release();
-//        return available;
-//    }
-
-//    // 오디오 작동 여부 체크 함수
-//    public boolean checkAudioEvent(){
-//        AudioManager manager = (AudioManager)activity.getSystemService(AUDIO_SERVICE);
-//        return manager.isMusicActive();
-//    }
 
     // 스크린 켜짐 여부 체크 함수
     public boolean checkScreenOn(){

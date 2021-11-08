@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         buttonStatus.setText(isRunning? "Monitoring":"Start");
 
         if(isRunning){
-            // 모니터링 스위치가 이미 켜진 경우
+            // 스위치가 이미 켜진 경우 모니터링 작동
 
             whitelistManager.initializeApps(MainActivity.this);
             startForegroundService(new Intent(MainActivity.this, ServiceManager.class));
@@ -91,7 +91,8 @@ public class MainActivity extends AppCompatActivity {
 
                 if (!preferences.getBoolean("isRunning", false)) {
                     // 스위치 켰을 때
-//                      권한 확인
+
+                    // 권한 확인
                     if (permissionChecker.checkAllPermissions()) {
                         // 모든 권한 있는 경우
 
@@ -106,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
                         // 모니터링 시작
                         startForegroundService(new Intent(MainActivity.this, ServiceManager.class));
 
+                        // 버튼 변경
                         buttonStatus.setBackgroundColor(Color.parseColor(colorRunning));
                         buttonStatus.setText("MONITORING");
                     }
@@ -117,8 +119,7 @@ public class MainActivity extends AppCompatActivity {
                     editor.putBoolean("isRunning", false); // 스위치 상태 변수 세팅
                     editor.apply(); // 스위치 상태 변수 저장
 
-                    // 오버레이 제거
-//                    startService(new Intent(MainActivity.this, ServiceManager.class));
+                    // 서비스 중지
                     stopService(new Intent(MainActivity.this, ServiceManager.class));
                 }
             }

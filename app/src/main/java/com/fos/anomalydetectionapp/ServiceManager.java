@@ -1,16 +1,11 @@
 package com.fos.anomalydetectionapp;
 
-import static android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND;
-import static android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE;
-import static android.content.ContentValues.TAG;
-import static android.view.WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
 
+import static android.view.WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
 import static java.lang.Thread.sleep;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.KeyguardManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -22,8 +17,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.IBinder;
-import android.provider.SyncStateContract;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -32,12 +25,9 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
-
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -46,13 +36,13 @@ import java.util.TreeMap;
 public class ServiceManager extends Service {
 
     @SuppressLint("StaticFieldLeak")
-    static Activity activity;
+    static Activity activity;  // 메인 액티비티
     @SuppressLint("StaticFieldLeak")
     static TrafficHistoryAdapter trafficHistoryAdapter;
     TrafficHistory trafficHistory;
     TrafficMonitor trafficMonitor;
-    WindowManager wm;
-    View mView;
+    WindowManager windowManager;
+    View overlayView;
     UserEventManager userEventManager;
 
     @Nullable
@@ -89,6 +79,7 @@ public class ServiceManager extends Service {
     }
 
     // 변수 세팅 함수
+    // 서비스 시작 전에 수행해야 함
     public void setArgs(Activity activity) {
         ServiceManager.activity = activity;
     }
@@ -102,7 +93,7 @@ public class ServiceManager extends Service {
     // 오버레이를 통해 터치 이벤트 발생 감지
     public void createOverlay(){
         LayoutInflater inflate = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        wm = (WindowManager) getSystemService(WINDOW_SERVICE);
+        windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
 
         // 오버레이 세팅
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
@@ -118,59 +109,57 @@ public class ServiceManager extends Service {
         // 오버레이 위치 설정
         params.gravity = Gravity.LEFT | Gravity.BOTTOM;
 
-        mView = inflate.inflate(R.layout.overlay_view, null);
+        overlayView = inflate.inflate(R.layout.overlay_view, null);
 
         // 터치가 감지된 경우
-        mView.setOnTouchListener(new View.OnTouchListener() {
+        overlayView.setOnTouchListener(new View.OnTouchListener() {
             @SuppressLint("ClickableViewAccessibility")
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                // 터치 발생 시간 업데이트
+                // 포어그라운드 앱의 터치 발생 시간 업데이트
 
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-//                        Log.e("current time:", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH시 mm분 ss초")));
-                        userEventManager.addTouchEvent(getForegroundApp(), LocalDateTime.now().minusSeconds(1));
-//                        Log.e("touch time:", LocalDateTime.now().minusSeconds(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH시 mm분 ss초")));
-                    }
-                }).start();
+                userEventManager.addTouchEvent(LocalDateTime.now().minusSeconds(1));
+//                new Thread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                    }
+//                }).start();
 
                 return true;
             }
         });
 
-        wm.addView(mView, params);
+        // 오버레이 생성
+        windowManager.addView(overlayView, params);
     }
 
-    public String getForegroundApp(){
-
-        try {
-            sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-
-        String currentApp = null;
-        UsageStatsManager usm = (UsageStatsManager) this.getSystemService(Context.USAGE_STATS_SERVICE);
-        long time = System.currentTimeMillis();
-
-        List<UsageStats> applist = usm.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, time - 1000 * 1000, time);
-        if (applist != null && applist.size() > 0) {
-            SortedMap<Long, UsageStats> mySortedMap = new TreeMap<>();
-            for (UsageStats usageStats : applist) {
-                mySortedMap.put(usageStats.getLastTimeUsed(), usageStats);
-            }
-            if (!mySortedMap.isEmpty()) {
-                currentApp = Objects.requireNonNull(mySortedMap.get(mySortedMap.lastKey())).getPackageName();
-            }
-        }
-//        Log.e(TAG, "Current Foreground App: " + currentApp);
-
-        return currentApp;
-
-    }
+//    public String getForegroundApp(){
+//
+//        try {
+//            sleep(1000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//
+//
+//        String currentApp = null;
+//        UsageStatsManager usm = (UsageStatsManager) this.getSystemService(Context.USAGE_STATS_SERVICE);
+//        long time = System.currentTimeMillis();
+//
+//        List<UsageStats> applist = usm.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, time - 1000 * 1000, time);
+//        if (applist != null && applist.size() > 0) {
+//            SortedMap<Long, UsageStats> mySortedMap = new TreeMap<>();
+//            for (UsageStats usageStats : applist) {
+//                mySortedMap.put(usageStats.getLastTimeUsed(), usageStats);
+//            }
+//            if (!mySortedMap.isEmpty()) {
+//                currentApp = Objects.requireNonNull(mySortedMap.get(mySortedMap.lastKey())).getPackageName();
+//            }
+//        }
+//
+//        return currentApp;
+//
+//    }
 
     // Notification 설정
     // Foreground Service가 실행되면 5초 이내에 notification 정보를 시스템에 보내야 함
@@ -206,12 +195,12 @@ public class ServiceManager extends Service {
         trafficMonitor.stopMonitoring();
 
         // terminate overlay
-        if(wm != null) {
-            if(mView != null) {
-                wm.removeView(mView);
-                mView = null;
+        if(windowManager != null) {
+            if(overlayView != null) {
+                windowManager.removeView(overlayView);
+                overlayView = null;
             }
-            wm = null;
+            windowManager = null;
         }
 
         stopForeground(true);
