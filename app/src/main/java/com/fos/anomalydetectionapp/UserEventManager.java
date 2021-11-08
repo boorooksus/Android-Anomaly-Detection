@@ -82,13 +82,19 @@ public class UserEventManager extends AppCompatActivity {
         // 화이트리스트 여부
         if (checkWhitelist(uid)) return 0;
 
-        // 스크린 온오프 여부
-        if (checkScreenOn()){
-            // 터치 이벤트 발생 여부
-            if(checkTouchEvent(processName)) return 1;
-            else return 2;
+//        // 스크린 온오프 여부
+//        if (checkScreenOn()){
+//            // 터치 이벤트 발생 여부
+//            if(checkTouchEvent(processName)) return 1;
+//            else return 2;
+//        }
+//        else return 3;
+
+        if(checkTouchEvent(processName)) return 1;
+        else{
+            if (checkScreenOn()) return 2;
+            else return 3;
         }
-        else return 3;
     }
 
     // 앱의 화이트리스트 등록 여부 체크 함수
